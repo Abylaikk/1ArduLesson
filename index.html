@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microcontrollers &amp; Arduino — Interactive Trial Lesson</title>
+<title>Sensors, Actuators &amp; Robots — Arduino Lab · Part 2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#101d3a; --navy2:#182a52; --ink:#1a2540; --ink-soft:#3a4763;
-    --teal:#178f87; --teal-d:#0f6e68; --teal-l:#e2f1ef;
-    --amber:#e3a23b; --amber-d:#b97f1f; --amber-l:#f9efdc;
-    --paper:#eef2f6; --line:#d7e0e9; --card:#fbfcfd; --muted:#5f6b83;
-    --green:#2c8f63; --green-l:#e2f2e9; --red:#c95555; --red-l:#f8e6e6;
-    --sh:0 2px 6px rgba(16,29,58,.06), 0 14px 34px -18px rgba(16,29,58,.25);
-    --sh-sm:0 1px 3px rgba(16,29,58,.07), 0 6px 16px -10px rgba(16,29,58,.2);
+    --navy:#20406e; --navy2:#2c548c; --ink:#1a2540; --ink-soft:#3a4763;
+    --teal:#17a099; --teal-d:#0f7a74; --teal-l:#e4f5f3;
+    --amber:#e8ab47; --amber-d:#b97f1f; --amber-l:#fbf2df;
+    --paper:#f6f9fc; --line:#dee6ee; --card:#ffffff; --muted:#5f6b83;
+    --green:#2fa171; --green-l:#e3f5ec; --red:#d16565; --red-l:#faeaea;
+    --sh:0 2px 6px rgba(16,29,58,.05), 0 14px 34px -18px rgba(16,29,58,.18);
+    --sh-sm:0 1px 3px rgba(16,29,58,.06), 0 6px 16px -10px rgba(16,29,58,.16);
     --r:18px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -23,9 +23,7 @@
   body{
     font-family:'Inter',system-ui,sans-serif;color:var(--ink);
     background:var(--paper);
-    background-image:
-      linear-gradient(rgba(23,143,135,.055) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(23,143,135,.055) 1px, transparent 1px);
+    background-image:linear-gradient(rgba(23,160,153,.05) 1px, transparent 1px),linear-gradient(90deg, rgba(23,160,153,.05) 1px, transparent 1px);
     background-size:26px 26px;
     min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;
   }
@@ -34,14 +32,13 @@
   .id{font-style:italic;color:var(--teal-d);font-weight:500}
   svg{display:block}
 
-  /* ===== top bar ===== */
   .topbar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:14px;
-    padding:12px clamp(14px,4vw,40px);background:rgba(238,242,246,.88);backdrop-filter:blur(12px);
+    padding:12px clamp(14px,4vw,40px);background:rgba(246,249,252,.9);backdrop-filter:blur(12px);
     border-bottom:1px solid var(--line)}
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-family:'Space Grotesk';color:var(--navy);font-size:15px;white-space:nowrap}
   .brand .bchip{width:32px;height:32px;border-radius:10px;background:var(--teal);display:grid;place-items:center;flex:none;box-shadow:var(--sh-sm)}
   .brand .bchip svg{width:18px;height:18px}
-  .progress-wrap{flex:1;height:7px;background:#dde5ec;border-radius:99px;overflow:hidden;min-width:50px}
+  .progress-wrap{flex:1;height:7px;background:#e2e9f0;border-radius:99px;overflow:hidden;min-width:50px}
   .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--amber));border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
   .score-chip{display:flex;align-items:center;gap:8px;background:var(--navy);color:#fff;padding:8px 15px;border-radius:99px;
     font-weight:700;font-size:14px;white-space:nowrap;box-shadow:var(--sh-sm);position:relative}
@@ -53,7 +50,6 @@
   .float-pts.big{color:var(--green)} .float-pts.small{color:var(--amber-d)}
   @keyframes floatUp{0%{opacity:0;transform:translateY(8px)}20%{opacity:1}100%{opacity:0;transform:translateY(-26px)}}
 
-  /* ===== stage & slides ===== */
   .stage{max-width:1040px;margin:0 auto;padding:100px clamp(14px,4vw,34px) 116px;min-height:100vh;display:flex;align-items:center}
   .slide{display:none;width:100%}
   .slide.active{display:block;animation:slideIn .55s cubic-bezier(.2,.75,.25,1)}
@@ -67,13 +63,9 @@
   .slide.active .opt:nth-child(1){animation-delay:.08s}
   .slide.active .opt:nth-child(2){animation-delay:.16s}
   .slide.active .opt:nth-child(3){animation-delay:.24s}
-  .slide.active .statcard{opacity:0;animation:rise .5s ease forwards}
-  .slide.active .statcard:nth-child(1){animation-delay:.1s}
-  .slide.active .statcard:nth-child(2){animation-delay:.22s}
-  .slide.active .statcard:nth-child(3){animation-delay:.34s}
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
-    .slide.active .points>li,.slide.active .opt,.slide.active .statcard{opacity:1!important}}
+    .slide.active .points>li,.slide.active .opt{opacity:1!important}}
 
   .eyebrow{font-family:'Space Grotesk';font-weight:600;letter-spacing:.15em;font-size:12px;text-transform:uppercase;
     color:var(--teal-d);margin-bottom:14px;display:flex;align-items:center;gap:9px}
@@ -98,10 +90,9 @@
   .visual{display:grid;place-items:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:22px;min-height:200px}
   .visual svg{max-width:100%;height:auto}
 
-  /* ===== real photos with graceful fallback ===== */
   .photo{margin:0}
   .ph-wrap{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);
-    background:linear-gradient(120deg,#e6ecf2,#f2f6f9);aspect-ratio:4/3;box-shadow:var(--sh)}
+    background:linear-gradient(120deg,#eef3f8,#f7fafc);aspect-ratio:4/3;box-shadow:var(--sh)}
   .ph-wrap img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
   .ph-wrap img.ld{opacity:1}
   .ph-wrap .ph-fb{position:absolute;inset:0;display:none;place-items:center;padding:20px}
@@ -109,43 +100,34 @@
   .ph-wrap.fail .ph-fb{display:grid}
   .photo figcaption{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.45}
   .photo .credit{display:block;font-size:11px;color:#93a0b5}
-  .photo.tall .ph-wrap{aspect-ratio:3/2.6}
 
-  .pro{display:inline-flex;align-items:flex-start;gap:10px;background:var(--amber-l);border:1px solid #ecd8ae;
+  .pro{display:inline-flex;align-items:flex-start;gap:10px;background:var(--amber-l);border:1px solid #f0dfb4;
     border-radius:13px;padding:11px 15px;margin-top:16px;font-size:13.5px;color:var(--ink)}
   .pro .pb{flex:none;background:var(--amber);color:#3a2600;font-family:'Space Grotesk';font-weight:700;font-size:10.5px;
     letter-spacing:.08em;border-radius:7px;padding:3px 8px;margin-top:1px}
   .pro .id{display:block;font-size:12.5px}
 
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:13px;margin-top:20px}
-  .statcard{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:18px 16px;text-align:center}
-  .statnum{font-family:'Space Grotesk';font-weight:700;font-size:clamp(24px,3.4vw,33px);color:var(--teal-d);line-height:1.05}
-  .statlbl{font-size:13px;color:var(--ink);font-weight:600;margin-top:6px}
-  .statid{font-size:12px}
-
-  /* ===== dark panels ===== */
   .dark-panel{background:
-      radial-gradient(110% 120% at 88% -10%, #1c3468 0%, transparent 55%),
-      radial-gradient(90% 100% at -5% 110%, #143152 0%, transparent 50%),
+      radial-gradient(120% 130% at 88% -10%, #3f78bf 0%, transparent 55%),
+      radial-gradient(90% 100% at -5% 110%, #1f9c92 0%, transparent 50%),
       var(--navy);
     color:#fff;border:none;position:relative;overflow:hidden;border-radius:26px;padding:clamp(30px,6vw,62px)}
   .dark-panel:before{content:"";position:absolute;inset:0;
-    background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
     background-size:30px 30px;opacity:.6}
   .dark-panel>*{position:relative;z-index:1}
   .blob{position:absolute;border-radius:50%;z-index:0;animation:drift 9s ease-in-out infinite alternate}
-  .b1{width:260px;height:260px;background:rgba(23,143,135,.2);top:-80px;right:-50px}
-  .b2{width:190px;height:190px;background:rgba(227,162,59,.14);bottom:-60px;left:-40px;animation-delay:2.5s}
+  .b1{width:260px;height:260px;background:rgba(23,160,153,.25);top:-80px;right:-50px}
+  .b2{width:190px;height:190px;background:rgba(232,171,71,.16);bottom:-60px;left:-40px;animation-delay:2.5s}
   @keyframes drift{from{transform:translate(0,0)}to{transform:translate(-16px,14px)}}
   .dark-panel .eyebrow{color:var(--amber)}
-  .cover h1{font-size:clamp(31px,5.8vw,54px);line-height:1.03;font-weight:700;letter-spacing:-.02em}
-  .cover .h1-id{color:var(--amber);font-size:clamp(17px,3vw,24px);margin-top:8px;font-style:italic;font-weight:600}
-  .cover p{color:#c6d2ea;max-width:58ch;margin-top:18px;font-size:clamp(14.5px,2vw,16.5px)}
-  .cover p .id{color:#84ddd3}
+  .cover h1{font-size:clamp(30px,5.6vw,52px);line-height:1.04;font-weight:700;letter-spacing:-.02em}
+  .cover .h1-id{color:var(--amber);font-size:clamp(16px,2.8vw,23px);margin-top:8px;font-style:italic;font-weight:600}
+  .cover p{color:#dbe6f5;max-width:58ch;margin-top:18px;font-size:clamp(14.5px,2vw,16.5px)}
+  .cover p .id{color:#9fe8de}
   .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;align-items:center}
-  .meta-pill{display:inline-flex;gap:8px;align-items:center;color:#9cb1d6;font-size:12.5px;border:1px solid rgba(255,255,255,.16);border-radius:99px;padding:7px 13px}
+  .meta-pill{display:inline-flex;gap:8px;align-items:center;color:#c4d5ec;font-size:12.5px;border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:7px 13px}
 
-  /* ===== buttons ===== */
   .btn{font-family:'Space Grotesk';font-weight:600;font-size:15.5px;border:none;cursor:pointer;border-radius:13px;
     padding:13px 24px;display:inline-flex;align-items:center;gap:10px;
     transition:transform .15s ease,box-shadow .2s ease,background .15s;box-shadow:var(--sh-sm)}
@@ -160,7 +142,6 @@
   .btn svg{width:17px;height:17px}
   .btn[disabled]{opacity:.35;cursor:not-allowed;transform:none}
 
-  /* ===== quiz ===== */
   .qnum{font-family:'Space Grotesk';font-weight:700;color:var(--amber-d);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase}
   .quiz h2{font-size:clamp(20px,3.3vw,29px);margin-top:6px;line-height:1.18;color:var(--ink)}
   .q-id{margin:6px 0 4px;font-size:15.5px}
@@ -183,7 +164,7 @@
   .feedback{margin-top:16px;border-radius:14px;padding:14px 17px;display:none;align-items:flex-start;gap:12px;font-size:14.5px}
   .feedback.show{display:flex;animation:slideIn .3s ease}
   .feedback.ok{background:var(--green-l);border:1px solid #bfe3d0}
-  .feedback.no{background:var(--amber-l);border:1px solid #ecd8ae}
+  .feedback.no{background:var(--amber-l);border:1px solid #f0dfb4}
   .feedback .fi{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:800}
   .feedback .fi svg{width:14px;height:14px}
   .feedback.ok .fi{background:var(--green)}
@@ -191,10 +172,10 @@
   .feedback b{display:block;color:var(--ink)}
   .feedback .id{font-size:13px}
 
-  /* ===== games ===== */
-  .game-tag{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-family:'Space Grotesk';
+  .task-tag{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-family:'Space Grotesk';
     font-weight:600;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:99px;margin-bottom:14px}
-  .game-tag svg{width:14px;height:14px}
+  .task-tag.build{background:var(--teal-d)}
+  .task-tag svg{width:14px;height:14px}
   .status-tag{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-family:'Space Grotesk';
     padding:7px 16px;border-radius:99px;font-size:13.5px;margin-top:8px}
   .status-tag.off{background:var(--red-l);color:var(--red)}
@@ -202,44 +183,6 @@
   .status-tag.mid{background:var(--amber-l);color:var(--amber-d)}
   .hint{color:var(--muted);font-size:13.5px;margin-top:10px}
   .gstage{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:20px;text-align:center}
-
-  .flowpath{stroke:#e3a23b;stroke-width:3.5;fill:none;stroke-linecap:round;stroke-dasharray:9 10;opacity:0;transition:opacity .3s}
-  .flowpath.on{opacity:1;animation:dashmove 1.1s linear infinite}
-  @keyframes dashmove{to{stroke-dashoffset:-38}}
-  .pulse{animation:pulse 1.6s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-
-  .pol-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}
-  @media(min-width:640px){.pol-grid{grid-template-columns:1fr 1fr}}
-  .pol-card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;text-align:center;
-    transition:border-color .15s,transform .12s,background .15s;box-shadow:var(--sh-sm)}
-  .pol-card:hover:not(.locked){border-color:var(--teal);transform:translateY(-3px)}
-  .pol-card.correct{border-color:var(--green);background:var(--green-l);animation:pop .35s ease}
-  .pol-card.wrong{border-color:var(--red);background:var(--red-l);animation:shake .4s ease}
-  .pol-card.locked{cursor:default}
-  .pol-card .pname{font-family:'Space Grotesk';font-weight:700;margin-top:10px;font-size:15px}
-  .pol-card .pid{font-size:13px}
-
-  .idgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:18px}
-  .idcard{background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px;cursor:pointer;text-align:center;
-    transition:all .15s;box-shadow:var(--sh-sm)}
-  .idcard:hover:not(.locked){border-color:var(--teal);transform:translateY(-3px)}
-  .idcard.correct{border-color:var(--green);background:var(--green-l);animation:pop .35s ease}
-  .idcard.wrong{border-color:var(--red);animation:shake .4s ease}
-  .idcard.locked{cursor:default}
-  .idcard .ph-wrap{aspect-ratio:4/3;box-shadow:none}
-  .idcard .lbl{font-family:'Space Grotesk';font-weight:700;font-size:14px;margin-top:9px}
-
-  .match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
-  .mcol{display:grid;gap:10px;align-content:start}
-  .mitem{background:#fff;border:2px solid var(--line);border-radius:13px;padding:12px 13px;cursor:pointer;font-weight:600;
-    font-size:14px;text-align:left;font-family:inherit;color:var(--ink);transition:border-color .15s,background .15s;box-shadow:var(--sh-sm)}
-  .mitem .id{display:block;font-size:12px;font-weight:500}
-  .mitem:hover:not(.done){border-color:var(--teal)}
-  .mitem.sel{border-color:var(--amber);background:var(--amber-l)}
-  .mitem.done{border-color:var(--green);background:var(--green-l);cursor:default;animation:pop .3s ease}
-  .mitem.err{animation:shake .4s ease;border-color:var(--red)}
-  .mitem .mono{font-size:15px}
 
   .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
   .chip{background:#fff;border:2px solid var(--line);border-radius:12px;padding:11px 15px;cursor:pointer;font-weight:600;
@@ -254,50 +197,53 @@
   .seq .arrowsep svg{width:16px;height:16px;color:var(--muted)}
   .seq .placeholder{color:var(--muted);font-size:13.5px;font-style:italic}
 
+  .match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .mcol{display:grid;gap:10px;align-content:start}
+  .mitem{background:#fff;border:2px solid var(--line);border-radius:13px;padding:12px 13px;cursor:pointer;font-weight:600;
+    font-size:14px;text-align:left;font-family:inherit;color:var(--ink);transition:border-color .15s,background .15s;box-shadow:var(--sh-sm)}
+  .mitem .id{display:block;font-size:12px;font-weight:500}
+  .mitem:hover:not(.done){border-color:var(--teal)}
+  .mitem.sel{border-color:var(--amber);background:var(--amber-l)}
+  .mitem.done{border-color:var(--green);background:var(--green-l);cursor:default;animation:pop .3s ease}
+  .mitem.err{animation:shake .4s ease;border-color:var(--red)}
+  .mitem .mono{font-size:15px}
+
+  .code{background:#0c1527;border-radius:16px;padding:20px;overflow:auto;box-shadow:var(--sh)}
+  .code .fname{color:#7e93c4;font-size:12.5px;margin-bottom:10px;font-family:'JetBrains Mono'}
+  .code pre{font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.85;color:#e6edf3}
+  .kw{color:#6fb1ff}.fn{color:#8fd6ce}.num{color:#ecba63}.cm{color:#7d9a76}.con{color:#c9a2e8}
+  .blank{background:#1d2b4d;border:2px dashed #5b76ad;border-radius:7px;padding:1px 10px;color:#c4d3ee;font-weight:700}
+  .blank.filled{border-style:solid;border-color:var(--teal);color:#8fe2d8}
+  .fillopts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .fillopt{background:#fff;border:2px solid var(--line);border-radius:12px;padding:11px 15px;cursor:pointer;font-weight:600;
+    font-family:'JetBrains Mono';font-size:13.5px;color:var(--ink);transition:all .15s;box-shadow:var(--sh-sm)}
+  .fillopt:hover:not(.locked){border-color:var(--teal);transform:translateY(-2px)}
+  .fillopt.correct{border-color:var(--green);background:var(--green-l);animation:pop .35s ease}
+  .fillopt.wrong{animation:shake .4s ease;border-color:var(--red);background:var(--red-l)}
+  .fillopt.locked{cursor:default;pointer-events:none}
+
   .sim{display:grid;gap:18px;grid-template-columns:1fr}
   @media(min-width:780px){.sim{grid-template-columns:1fr 1fr}}
-  .code{background:#0c1527;border-radius:16px;padding:20px;overflow:auto;box-shadow:var(--sh)}
-  .code .fname{color:#6d7fa8;font-size:12.5px;margin-bottom:10px;font-family:'JetBrains Mono'}
-  .code pre{font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.8;color:#e6edf3}
-  .kw{color:#6fb1ff}.fn{color:#8fd6ce}.num{color:#ecba63}.cm{color:#7d9a76}.con{color:#c9a2e8}
-  .simled{width:74px;height:74px;border-radius:50%;background:#cfd6e0;border:4px solid #aab4c2;margin:14px auto 6px;
-    transition:background .18s,border-color .18s,box-shadow .18s}
-  .simled.on{background:var(--amber);border-color:var(--amber-d);box-shadow:0 0 0 10px rgba(227,162,59,.18),0 0 26px rgba(227,162,59,.55)}
-  .slider-row{display:flex;align-items:center;gap:12px;margin-top:16px;justify-content:center;flex-wrap:wrap}
-  input[type=range]{accent-color:var(--teal);width:min(230px,62%)}
-  .delayval{font-family:'JetBrains Mono';font-weight:700;color:var(--teal-d);font-size:14px;min-width:76px;text-align:left}
-
-  /* ohm lab / pwm shared displays */
-  .bigread{font-family:'Space Grotesk';font-weight:700;font-size:clamp(34px,6vw,50px);color:var(--ink);line-height:1}
-  .bigread small{font-size:.45em;color:var(--muted);font-weight:600}
-  .zone{position:relative;height:16px;border-radius:99px;background:#dde5ec;margin:16px 8px 6px;overflow:visible}
-  .zone .safe{position:absolute;top:0;bottom:0;background:rgba(44,143,99,.3);border:1.5px solid var(--green);border-radius:99px}
-  .zone .needle{position:absolute;top:-5px;width:4px;height:26px;background:var(--navy);border-radius:3px;transition:left .2s ease}
+  .bigread{font-family:'Space Grotesk';font-weight:700;font-size:clamp(32px,5.6vw,46px);color:var(--ink);line-height:1}
+  .bigread small{font-size:.42em;color:var(--muted);font-weight:600}
+  .zone{position:relative;height:16px;border-radius:99px;background:#e2e9f0;margin:16px 8px 6px;overflow:visible}
+  .zone .safe{position:absolute;top:0;bottom:0;background:rgba(47,161,113,.32);border:1.5px solid var(--green);border-radius:99px}
+  .zone .needle{position:absolute;top:-5px;width:4px;height:26px;background:var(--navy);border-radius:3px;transition:left .15s ease}
   .zlbl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin:2px 10px 0}
-  .formula{font-family:'JetBrains Mono';font-weight:700;font-size:clamp(17px,2.6vw,22px);color:var(--teal-d);
-    background:var(--teal-l);border-radius:12px;padding:10px 16px;display:inline-block;margin-top:12px}
+  .formula{font-family:'JetBrains Mono';font-weight:700;font-size:clamp(16px,2.4vw,20px);color:var(--teal-d);
+    background:var(--teal-l);border-radius:12px;padding:9px 15px;display:inline-block;margin-top:10px}
+  .slider-row{display:flex;align-items:center;gap:12px;margin-top:14px;justify-content:flex-start;flex-wrap:wrap}
+  input[type=range]{accent-color:var(--teal);width:min(230px,58%)}
+  .rowval{font-family:'JetBrains Mono';font-weight:700;color:var(--teal-d);font-size:14px;min-width:80px;text-align:left}
+  .dial{width:110px;height:110px;border-radius:50%;background:#fff;border:4px solid var(--line);margin:10px auto;position:relative;box-shadow:var(--sh-sm)}
+  .dial .needle2{position:absolute;left:50%;top:50%;width:4px;height:44px;background:var(--teal-d);border-radius:3px;transform-origin:bottom center;transform:translate(-50%,-100%) rotate(0deg);transition:transform .12s}
+  .servo-arm{width:8px;height:70px;background:var(--teal-d);border-radius:4px;position:absolute;left:50%;bottom:50%;transform-origin:bottom center;transform:translateX(-50%) rotate(0deg);transition:transform .12s}
+  .servo-base{width:56px;height:56px;border-radius:50%;background:#fff;border:4px solid var(--line);position:relative;margin:0 auto}
+  .colorsw{width:120px;height:120px;border-radius:16px;margin:10px auto;border:4px solid #fff;box-shadow:var(--sh)}
+  .simled{width:70px;height:70px;border-radius:50%;background:#cfd6e0;border:4px solid #aab4c2;margin:14px auto 6px;
+    transition:background .18s,border-color .18s,box-shadow .18s}
+  .simled.on{background:var(--amber);border-color:var(--amber-d);box-shadow:0 0 0 10px rgba(232,171,71,.18),0 0 26px rgba(232,171,71,.5)}
 
-  .bits{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-  .bit{width:76px;border:2px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;padding:12px 6px;text-align:center;
-    font-family:'Space Grotesk';transition:all .15s;box-shadow:var(--sh-sm)}
-  .bit:hover{border-color:var(--teal)}
-  .bit .bv{font-size:11.5px;color:var(--muted);font-weight:600}
-  .bit .bd{font-size:30px;font-weight:700;color:#b9c4d4;line-height:1.15}
-  .bit.on{border-color:var(--teal);background:var(--teal-l)}
-  .bit.on .bd{color:var(--teal-d)}
-
-  .buglines{display:grid;gap:8px;margin-top:16px}
-  .bugline{font-family:'JetBrains Mono';font-size:14px;text-align:left;background:#0c1527;color:#e6edf3;border:2px solid #1d2b4d;
-    border-radius:11px;padding:12px 14px;cursor:pointer;transition:all .15s}
-  .bugline:hover:not(.locked){border-color:var(--teal)}
-  .bugline.correct{border-color:var(--green);background:#0f2c1f;animation:pop .35s ease}
-  .bugline.wrong{border-color:var(--red);animation:shake .4s ease}
-  .bugline.locked{cursor:default}
-
-  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
-  .gallery .photo figcaption b{color:var(--ink);font-size:13.5px}
-
-  /* ===== results ===== */
   .results{text-align:center}
   .results h2{font-size:clamp(25px,5vw,40px)}
   .ring-wrap{display:grid;place-items:center;margin:20px 0 8px}
@@ -306,27 +252,28 @@
   .ring .rc{transition:stroke-dashoffset 1.5s cubic-bezier(.2,.7,.2,1)}
   .ring .center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
   .ring .big{font-family:'Space Grotesk';font-weight:700;font-size:40px;line-height:1;color:#fff}
-  .ring .sub{color:#8fe2d8;font-size:12.5px;margin-top:5px;font-weight:600}
+  .ring .sub{color:#9fe8de;font-size:12.5px;margin-top:5px;font-weight:600}
   .level{display:inline-flex;gap:9px;align-items:center;background:var(--amber);color:#3a2600;font-family:'Space Grotesk';
     font-weight:700;padding:9px 20px;border-radius:99px;font-size:16px;margin-top:6px}
   .level svg{width:16px;height:16px}
-  .res-line{color:#c6d2ea;max-width:54ch;margin:14px auto 0;font-size:15px}
-  .res-line .id{color:#84ddd3}
+  .res-line{color:#dbe6f5;max-width:54ch;margin:14px auto 0;font-size:15px}
+  .res-line .id{color:#9fe8de}
   .stat-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-  .stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:13px;padding:11px 18px;min-width:104px}
+  .stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:11px 18px;min-width:104px}
   .stat .sv{font-family:'Space Grotesk';font-weight:700;font-size:21px}
-  .stat .sl{font-size:11.5px;color:#9cb1d6;letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
-  .credits{font-size:11px;color:#7e90b4;margin-top:20px}
+  .stat .sl{font-size:11.5px;color:#c4d5ec;letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+  .credits{font-size:11px;color:#93a8cf;margin-top:20px}
 
-  /* ===== nav ===== */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
+
   .nav{position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding:12px clamp(14px,4vw,40px);background:rgba(238,242,246,.9);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+    padding:12px clamp(14px,4vw,40px);background:rgba(246,249,252,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
   .counter{font-family:'Space Grotesk';font-weight:600;color:var(--muted);font-size:13.5px}
   .counter b{color:var(--ink)}
   .nav .spacer{flex:1}
   @media(max-width:560px){.btn{padding:12px 16px;font-size:14.5px}.brand span.full{display:none}}
   .kbd-hint{position:fixed;bottom:70px;right:16px;font-size:11.5px;color:var(--muted);z-index:40;
-    background:rgba(255,255,255,.75);padding:4px 10px;border-radius:8px;border:1px solid var(--line)}
+    background:rgba(255,255,255,.8);padding:4px 10px;border-radius:8px;border:1px solid var(--line)}
   @media(max-width:700px){.kbd-hint{display:none}}
 </style>
 </head>
@@ -335,11 +282,11 @@
 <div class="topbar">
   <div class="brand">
     <span class="bchip"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></span>
-    <span class="full">Arduino Lab</span>
+    <span class="full">Arduino Lab · Part 2</span>
   </div>
   <div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
   <div class="score-chip" id="scoreChip">
-    <svg viewBox="0 0 24 24" fill="#e3a23b"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+    <svg viewBox="0 0 24 24" fill="#e8ab47"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
     <span id="scoreVal">0</span>
   </div>
 </div>
@@ -362,27 +309,24 @@
 
 <script>
 /* ============================================================
-   ICONS — inline SVG only, no emoji/stickers
+   ICONS
 ============================================================ */
 const I = {
   chip:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>',
-  board:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="8" y="9" width="8" height="5" rx="1"/><path d="M6 4v2M10 4v2M14 4v2M18 4v2"/></svg>',
   bolt:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M13 2L4.5 13.5H11l-1 8.5L19.5 10H13z"/></svg>',
   wave:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l3-7 6 14 3-7h4"/></svg>',
   bulb:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>',
-  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>',
   plug:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0z"/></svg>',
   code:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg>',
   game:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="12" rx="6"/><path d="M8 11v4M6 13h4M15 12h.01M18 14h.01"/></svg>',
+  hammer:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5l4 4L9 19H5v-4z"/><path d="M17.5 2.5l4 4-3 3-4-4z"/></svg>',
   flag:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 1-1c5 0 6 3 10 3 2 0 3-.5 4-1v10c-1 .5-2 1-4 1-4 0-5-3-10-3"/></svg>',
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
   shield:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9.4-8 11-4.5-1.6-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg>',
-  history:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
   binary:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="7" height="7" rx="1.5"/><path d="M17 4v7M15 11h4M6 15v6M4 21h4"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   rocket:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M12 15l-3-3a11 11 0 0 1 6-8c3-1 6-1 6-1s0 3-1 6a11 11 0 0 1-8 6z"/><circle cx="15" cy="9" r="1.5"/></svg>',
   tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-  toggle:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="16" cy="12" r="3" fill="#fff"/></svg>',
   refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"/></svg>',
   play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>',
   trophy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v6a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 5M17 6h3a3 3 0 0 1-3 5"/></svg>',
@@ -390,289 +334,229 @@ const I = {
 };
 
 /* ============================================================
-   REAL PHOTOS — Wikimedia Commons (CC / PD), with SVG fallback
+   PHOTOS — Wikimedia Commons, graceful SVG fallback on error
 ============================================================ */
 const WM = n => 'https://commons.wikimedia.org/wiki/Special:FilePath/' + n + '?width=900';
 const PH = {
-  uno:      {u:WM('Arduino_Uno_-_R3.jpg'), c:'Arduino Uno R3 board · Photo: SparkFun via Wikimedia Commons, CC BY 2.0'},
-  chip:     {u:WM('ATMEGA328P-PU.jpg'), c:'ATmega328P microcontroller chip · Photo: Wikimedia Commons'},
-  bread:    {u:WM('400_points_breadboard.jpg'), c:'A 400-point solderless breadboard · Photo: Wikimedia Commons'},
-  breadled: {u:WM('Solderless_Breadboard_with_LEDs.jpg'), c:'Breadboard circuit with LEDs · Photo: Wikimedia Commons'},
-  jumpers:  {u:WM('A_few_Jumper_Wires.jpg'), c:'Jumper wires · Photo: Wikimedia Commons'},
-  leds:     {u:WM('Verschiedene_LEDs.jpg'), c:'LEDs of different colors · Photo: Wikimedia Commons, CC BY-SA 2.0'},
-  resistors:{u:WM('Electronic-Axial-Lead-Resistors-Array.png'), c:'Axial resistors with color bands · Photo: Wikimedia Commons'},
-  sonar:    {u:WM('HC_SR04_Ultrasonic_sensor_1480322_3_4_HDR_Enhancer.jpg'), c:'HC-SR04 ultrasonic distance sensor · Photo: Wikimedia Commons'},
-  robot:    {u:WM('Faraduino_buggy.jpg'), c:'Arduino-powered robot buggy · Photo: Wikimedia Commons'},
-  robot2:   {u:WM('Arduino_Robot_Top.jpg'), c:'Official Arduino Robot · Photo: Wikimedia Commons'},
-  mounted:  {u:WM('Arduino_%26_breadboard,_mounted.jpg'), c:'Arduino + breadboard project · Photo: Wikimedia Commons'},
+  chip:{u:WM('ATMEGA328P-PU.jpg'), c:'ATmega328P microcontroller · Wikimedia Commons'},
+  uno:{u:WM('Arduino_Uno_-_R3.jpg'), c:'Arduino Uno R3 · SparkFun via Wikimedia Commons, CC BY 2.0'},
+  resistors:{u:WM('Electronic-Axial-Lead-Resistors-Array.png'), c:'Axial resistors · Wikimedia Commons'},
+  leds:{u:WM('Verschiedene_LEDs.jpg'), c:'LEDs of different colors · Wikimedia Commons, CC BY-SA 2.0'},
+  bread:{u:WM('400_points_breadboard.jpg'), c:'400-point breadboard · Wikimedia Commons'},
+  sonar:{u:WM('HC_SR04_Ultrasonic_sensor_1480322_3_4_HDR_Enhancer.jpg'), c:'HC-SR04 ultrasonic sensor · Wikimedia Commons'},
+  servo:{u:WM('Tower_Pro_SG90_micro_servo_motor.jpg'), c:'SG90 micro servo motor · Wikimedia Commons'},
+  dht:{u:WM('Dht11_term_and_humidity_sensor.jpg'), c:'DHT11 temperature & humidity sensor · Wikimedia Commons'},
+  robot:{u:WM('Faraduino_buggy.jpg'), c:'Arduino-powered robot buggy · Wikimedia Commons'},
+  robot2:{u:WM('Arduino_Robot_Top.jpg'), c:'Official Arduino Robot · Wikimedia Commons'},
+  mounted:{u:WM('Arduino_%26_breadboard,_mounted.jpg'), c:'Arduino + breadboard project · Wikimedia Commons'},
 };
-/* fallback drawings if a photo cannot load */
+function boxSVG(bg,label,sub,w,h){
+  w=w||220;h=h||130;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${Math.min(w,230)}"><rect x="6" y="6" width="${w-12}" height="${h-12}" rx="14" fill="${bg}"/>
+    <text x="${w/2}" y="${h/2-2}" fill="#fff" font-size="15" font-weight="700" text-anchor="middle" font-family="'Space Grotesk',sans-serif">${label}</text>
+    <text x="${w/2}" y="${h/2+18}" fill="#cfe3f2" font-size="10.5" text-anchor="middle" font-family="sans-serif">${sub}</text></svg>`;
+}
 const FB = {
-  board:`<svg viewBox="0 0 260 170" width="230"><rect x="20" y="30" width="220" height="110" rx="10" fill="#0f6e68"/><rect x="6" y="44" width="24" height="30" rx="3" fill="#b6bcc7"/><rect x="120" y="70" width="60" height="26" rx="3" fill="#101d3a"/><rect x="45" y="34" width="150" height="10" rx="2" fill="#101d3a"/><rect x="45" y="126" width="160" height="10" rx="2" fill="#101d3a"/><text x="130" y="60" fill="#d3f2ee" font-size="13" font-weight="700" text-anchor="middle" font-style="italic" font-family="sans-serif">ARDUINO UNO</text></svg>`,
-  chip:`<svg viewBox="0 0 200 160" width="180"><rect x="60" y="40" width="80" height="80" rx="8" fill="#101d3a"/><rect x="78" y="58" width="44" height="44" rx="5" fill="#178f87"/></svg>`,
-  bread:`<svg viewBox="0 0 260 150" width="220"><rect x="10" y="10" width="240" height="130" rx="10" fill="#eceff4" stroke="#c7ced8" stroke-width="2"/>${Array.from({length:6}).map((_,r)=>Array.from({length:11}).map((_,c)=>`<circle cx="${30+c*20}" cy="${30+r*18}" r="4.5" fill="#9aa6bc"/>`).join('')).join('')}</svg>`,
   led:`<svg viewBox="0 0 160 160" width="130"><circle cx="80" cy="62" r="40" fill="#c95555" stroke="#96322f" stroke-width="3"/><line x1="66" y1="100" x2="66" y2="150" stroke="#9aa0ac" stroke-width="6" stroke-linecap="round"/><line x1="94" y1="100" x2="94" y2="132" stroke="#9aa0ac" stroke-width="6" stroke-linecap="round"/></svg>`,
-  resistor:`<svg viewBox="0 0 260 90" width="210"><line x1="10" y1="45" x2="80" y2="45" stroke="#1a2540" stroke-width="4"/><rect x="80" y="26" width="100" height="38" rx="7" fill="#d9a066" stroke="#8a5a2b" stroke-width="2"/><rect x="94" y="26" width="7" height="38" fill="#7a3b2e"/><rect x="110" y="26" width="7" height="38" fill="#1a1a1a"/><rect x="126" y="26" width="7" height="38" fill="#b34038"/><line x1="180" y1="45" x2="250" y2="45" stroke="#1a2540" stroke-width="4"/></svg>`,
+  resistor:`<svg viewBox="0 0 260 90" width="210"><line x1="10" y1="45" x2="80" y2="45" stroke="#1a2540" stroke-width="4"/><rect x="80" y="26" width="100" height="38" rx="7" fill="#d9a066" stroke="#8a5a2b" stroke-width="2"/><line x1="180" y1="45" x2="250" y2="45" stroke="#1a2540" stroke-width="4"/></svg>`,
   sensor:`<svg viewBox="0 0 220 130" width="190"><rect x="20" y="30" width="180" height="70" rx="8" fill="#16407a"/><circle cx="70" cy="65" r="26" fill="#101d3a" stroke="#8b98b2" stroke-width="4"/><circle cx="150" cy="65" r="26" fill="#101d3a" stroke="#8b98b2" stroke-width="4"/></svg>`,
   robot:`<svg viewBox="0 0 220 140" width="190"><rect x="40" y="40" width="140" height="55" rx="10" fill="#0f6e68"/><circle cx="70" cy="108" r="18" fill="#101d3a"/><circle cx="150" cy="108" r="18" fill="#101d3a"/><rect x="86" y="20" width="48" height="24" rx="6" fill="#101d3a"/><circle cx="100" cy="32" r="4" fill="#84ddd3"/><circle cx="120" cy="32" r="4" fill="#84ddd3"/></svg>`,
-  wires:`<svg viewBox="0 0 220 120" width="190">${['#c95555','#e3a23b','#178f87','#16407a','#1a2540'].map((c,i)=>`<path d="M20 ${25+i*18} C 80 ${5+i*22}, 140 ${45+i*14}, 200 ${25+i*18}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`).join('')}</svg>`,
 };
 function phFail(img){ img.closest('.ph-wrap').classList.add('fail'); }
 function phLoad(img){ img.classList.add('ld'); }
-function photo(key, fbKey, capEn, capId, tall){
+function photo(key, fbHtml, capEn, capId){
   const p = PH[key];
-  return `<figure class="photo ${tall?'tall':''}">
+  return `<figure class="photo">
     <div class="ph-wrap"><img src="${p.u}" alt="${capEn}" loading="lazy" referrerpolicy="no-referrer" onload="phLoad(this)" onerror="phFail(this)">
-    <div class="ph-fb">${FB[fbKey]}</div></div>
+    <div class="ph-fb">${fbHtml}</div></div>
     <figcaption><b>${capEn}</b> <span class="id">/ ${capId}</span><span class="credit">${p.c}</span></figcaption>
   </figure>`;
 }
 
 /* ============================================================
-   QUESTION POOL — 20 questions in 4 topics, shuffled every run
+   ABSTRACT DIAGRAM SVGs
 ============================================================ */
-const POOL = {
-  circuit:[
-    {q:{en:'Electricity flows only when the circuit is…',id:'Listrik mengalir hanya saat rangkaian…'},
-     opts:[{en:'Closed — a complete loop',id:'Tertutup — lingkaran lengkap',ok:1},{en:'Open — broken somewhere',id:'Terbuka — terputus'},{en:'Very long',id:'Sangat panjang'}],
-     exp:{en:'A closed loop lets current travel all the way around.',id:'Lingkaran tertutup membuat arus mengalir penuh.'}},
-    {q:{en:'Voltage is like… (water pipe idea)',id:'Tegangan itu seperti… (analogi pipa air)'},
-     opts:[{en:'Water pressure — the push',id:'Tekanan air — dorongan',ok:1},{en:'The pipe color',id:'Warna pipa'},{en:'The pipe length',id:'Panjang pipa'}],
-     exp:{en:'Voltage is the push that moves electricity.',id:'Tegangan adalah dorongan yang menggerakkan listrik.'}},
-    {q:{en:'What does GND (ground) mean?',id:'Apa arti GND (ground)?'},
-     opts:[{en:'Where the loop returns',id:'Tempat rangkaian kembali',ok:1},{en:'The fastest pin',id:'Pin tercepat'},{en:'A kind of sensor',id:'Sejenis sensor'}],
-     exp:{en:'Every circuit must return to a GND pin to close the loop.',id:'Setiap rangkaian harus kembali ke pin GND.'}},
-    {q:{en:'Current tells us…',id:'Arus memberi tahu kita…'},
-     opts:[{en:'How much electricity flows',id:'Berapa banyak listrik mengalir',ok:1},{en:'How hot the wire looks',id:'Seberapa panas kabel terlihat'},{en:'The board size',id:'Ukuran papan'}],
-     exp:{en:'Current = the amount of flow, measured in amperes (A).',id:'Arus = jumlah aliran, diukur dalam ampere (A).'}},
-    {q:{en:'Resistance is measured in…',id:'Hambatan diukur dalam…'},
-     opts:[{en:'Ohms (Ω)',id:'Ohm (Ω)',ok:1},{en:'Meters (m)',id:'Meter (m)'},{en:'Liters (L)',id:'Liter (L)'}],
-     exp:{en:'Ohms honor Georg Ohm, who discovered V = I × R.',id:'Ohm diambil dari nama Georg Ohm, penemu V = I × R.'}},
-  ],
-  parts:[
-    {q:{en:'Which part protects the LED from too much current?',id:'Komponen apa yang melindungi LED dari arus berlebih?'},
-     opts:[{en:'Resistor',id:'Resistor',ok:1},{en:'Battery',id:'Baterai'},{en:'Extra wire',id:'Kabel tambahan'}],
-     exp:{en:'The resistor limits current so the LED stays safe.',id:'Resistor membatasi arus agar LED aman.'}},
-    {q:{en:'The long leg of an LED is the…',id:'Kaki panjang LED adalah…'},
-     opts:[{en:'Plus (+)',id:'Positif (+)',ok:1},{en:'Minus (–)',id:'Negatif (–)'},{en:'Ground',id:'Ground'}],
-     exp:{en:'Long leg = +, short leg = –. Direction matters!',id:'Kaki panjang = +, pendek = –. Arah itu penting!'}},
-    {q:{en:'The colored bands on a resistor show…',id:'Pita warna pada resistor menunjukkan…'},
-     opts:[{en:'Its value in ohms (Ω)',id:'Nilainya dalam ohm (Ω)',ok:1},{en:'Its favorite color',id:'Warna kesukaannya'},{en:'Its temperature',id:'Suhunya'}],
-     exp:{en:'Bands are a color code for the resistance value.',id:'Pita adalah kode warna untuk nilai hambatan.'}},
-    {q:{en:'On a breadboard, holes in the same column are…',id:'Di breadboard, lubang di kolom yang sama…'},
-     opts:[{en:'Connected inside',id:'Terhubung di dalam',ok:1},{en:'Never connected',id:'Tidak pernah terhubung'},{en:'Filled with glue',id:'Diisi lem'}],
-     exp:{en:'Metal strips inside connect each column of holes.',id:'Strip logam di dalam menghubungkan tiap kolom.'}},
-    {q:{en:'A breadboard is perfect for beginners because…',id:'Breadboard cocok untuk pemula karena…'},
-     opts:[{en:'No soldering — just push parts in',id:'Tanpa solder — tinggal tancapkan',ok:1},{en:'It cooks bread',id:'Bisa memanggang roti'},{en:'It is made of metal only',id:'Terbuat dari logam saja'}],
-     exp:{en:'You can build, test, and rebuild in minutes.',id:'Kamu bisa merakit, menguji, dan merakit ulang dalam hitungan menit.'}},
-  ],
-  pins:[
-    {q:{en:'Which pins give electricity to your parts?',id:'Pin mana yang memberi listrik ke komponen?'},
-     opts:[{en:'Power pins (5V, 3.3V, GND)',id:'Pin daya (5V, 3,3V, GND)',ok:1},{en:'Analog pins (A0–A5)',id:'Pin analog (A0–A5)'},{en:'The USB port only',id:'Hanya port USB'}],
-     exp:{en:'Power pins supply electricity; the loop returns to GND.',id:'Pin daya memberi listrik; rangkaian kembali ke GND.'}},
-    {q:{en:'A digital pin can be…',id:'Pin digital hanya bisa…'},
-     opts:[{en:'Only HIGH or LOW',id:'Hanya HIGH atau LOW',ok:1},{en:'Any value 0–1023',id:'Nilai apa pun 0–1023'},{en:'Half on',id:'Setengah nyala'}],
-     exp:{en:'Digital = two states, like a light switch.',id:'Digital = dua keadaan, seperti saklar.'}},
-    {q:{en:'Analog pins (A0–A5) are great for…',id:'Pin analog (A0–A5) cocok untuk…'},
-     opts:[{en:'Reading sensor values (0–1023)',id:'Membaca nilai sensor (0–1023)',ok:1},{en:'Charging the battery',id:'Mengisi baterai'},{en:'Cooling the chip',id:'Mendinginkan chip'}],
-     exp:{en:'They read a whole range of in-between values.',id:'Mereka membaca rentang nilai di antara.'}},
-    {q:{en:'PWM pins (marked ~) are used to…',id:'Pin PWM (bertanda ~) dipakai untuk…'},
-     opts:[{en:'Dim an LED or set motor speed',id:'Meredupkan LED atau atur kecepatan motor',ok:1},{en:'Connect to Wi-Fi',id:'Terhubung ke Wi-Fi'},{en:'Store your code',id:'Menyimpan kodemu'}],
-     exp:{en:'PWM switches so fast it acts like analog output.',id:'PWM berkedip sangat cepat hingga terasa analog.'}},
-    {q:{en:'How many digital pins does the Uno have?',id:'Berapa pin digital yang dimiliki Uno?'},
-     opts:[{en:'14 (numbered 0–13)',id:'14 (bernomor 0–13)',ok:1},{en:'2',id:'2'},{en:'100',id:'100'}],
-     exp:{en:'14 digital pins — and 6 of them can also do PWM.',id:'14 pin digital — dan 6 di antaranya bisa PWM.'}},
-  ],
-  code:[
-    {q:{en:'Which function repeats over and over, forever?',id:'Fungsi mana yang berulang terus, selamanya?'},
-     opts:[{en:'loop()',id:'loop()',ok:1},{en:'setup()',id:'setup()'},{en:'stop()',id:'stop()'}],
-     exp:{en:'setup() runs once; loop() runs again and again.',id:'setup() sekali; loop() berulang terus.'}},
-    {q:{en:'What does digitalWrite(13, HIGH) do?',id:'Apa yang dilakukan digitalWrite(13, HIGH)?'},
-     opts:[{en:'Turns pin 13 ON',id:'Menyalakan pin 13',ok:1},{en:'Turns pin 13 OFF',id:'Mematikan pin 13'},{en:'Deletes pin 13',id:'Menghapus pin 13'}],
-     exp:{en:'HIGH = on, LOW = off.',id:'HIGH = nyala, LOW = mati.'}},
-    {q:{en:'delay(1000) makes the Arduino wait…',id:'delay(1000) membuat Arduino menunggu…'},
-     opts:[{en:'1 second',id:'1 detik',ok:1},{en:'1000 seconds',id:'1000 detik'},{en:'1 minute',id:'1 menit'}],
-     exp:{en:'delay counts milliseconds: 1000 ms = 1 s.',id:'delay menghitung milidetik: 1000 ms = 1 detik.'}},
-    {q:{en:'pinMode(13, OUTPUT) tells the board…',id:'pinMode(13, OUTPUT) memberi tahu papan…'},
-     opts:[{en:'Pin 13 will send power out',id:'Pin 13 akan mengirim daya keluar',ok:1},{en:'Pin 13 is broken',id:'Pin 13 rusak'},{en:'Pin 13 reads a sensor',id:'Pin 13 membaca sensor'}],
-     exp:{en:'OUTPUT = the pin controls something, like an LED.',id:'OUTPUT = pin mengendalikan sesuatu, seperti LED.'}},
-    {q:{en:'The Arduino language is based on…',id:'Bahasa Arduino berbasis pada…'},
-     opts:[{en:'C / C++ — a real pro language',id:'C / C++ — bahasa profesional sungguhan',ok:1},{en:'Emoji',id:'Emoji'},{en:'Morse code',id:'Kode Morse'}],
-     exp:{en:'You are learning the same family of languages real engineers use.',id:'Kamu belajar keluarga bahasa yang dipakai insinyur sungguhan.'}},
-  ],
+const SVGS = {
+  adc:`<svg viewBox="0 0 260 140" width="240">${Array.from({length:8}).map((_,i)=>`<rect x="${14+i*30}" y="${120-(i+1)*13}" width="20" height="${(i+1)*13}" rx="3" fill="#17a099" opacity="${0.35+i*0.08}"/>`).join('')}<text x="130" y="135" fill="#5f6b83" font-size="11" text-anchor="middle" font-family="sans-serif">analogRead() returns 0 – 1023</text></svg>`,
+  divider:`<svg viewBox="0 0 220 170" width="200"><rect x="90" y="10" width="40" height="60" rx="6" fill="#d9a066" stroke="#8a5a2b" stroke-width="2"/><text x="110" y="45" font-size="11" text-anchor="middle" fill="#4a2f13" font-family="monospace">R fixed</text><line x1="110" y1="70" x2="110" y2="95" stroke="#1a2540" stroke-width="3"/><circle cx="110" cy="105" r="10" fill="#17a099"/><text x="110" y="109" font-size="10" text-anchor="middle" fill="#fff" font-family="sans-serif">A0</text><line x1="110" y1="115" x2="110" y2="130" stroke="#1a2540" stroke-width="3"/><rect x="90" y="130" width="40" height="30" rx="6" fill="#16407a"/><text x="110" y="149" font-size="9.5" text-anchor="middle" fill="#cfe3f2" font-family="sans-serif">sensor</text><text x="180" y="20" font-size="10.5" fill="#5f6b83" font-family="sans-serif">5V</text><text x="180" y="165" font-size="10.5" fill="#5f6b83" font-family="sans-serif">GND</text></svg>`,
+  button:`<svg viewBox="0 0 200 140" width="180"><rect x="60" y="40" width="80" height="60" rx="10" fill="#dfe6ee" stroke="#9aa6bc" stroke-width="3"/><circle cx="100" cy="70" r="20" fill="#e8ab47" stroke="#b97f1f" stroke-width="3"/><line x1="60" y1="55" x2="20" y2="55" stroke="#1a2540" stroke-width="3"/><line x1="60" y1="85" x2="20" y2="85" stroke="#1a2540" stroke-width="3"/><line x1="140" y1="55" x2="180" y2="55" stroke="#1a2540" stroke-width="3"/><line x1="140" y1="85" x2="180" y2="85" stroke="#1a2540" stroke-width="3"/></svg>`,
+  pir:`<svg viewBox="0 0 200 150" width="180"><circle cx="100" cy="80" r="46" fill="#eef3f8" stroke="#9aa6bc" stroke-width="3"/><path d="M100 34 a46 46 0 0 1 0 92" fill="#c7d6e6"/><circle cx="100" cy="80" r="18" fill="#16407a"/>${[0,1,2].map(i=>`<path d="M${100-70+i*70} 20 q ${i*70-30} 60 0 120" fill="none" stroke="#e8ab47" stroke-width="2" opacity=".6"/>`).join('')}<rect x="70" y="128" width="60" height="16" rx="4" fill="#101d3a"/></svg>`,
+  motor:`<svg viewBox="0 0 240 140" width="220"><rect x="20" y="40" width="90" height="60" rx="8" fill="#101d3a"/><circle cx="65" cy="70" r="22" fill="#3a4763"/><rect x="110" y="60" width="14" height="20" fill="#8b98b2"/><rect x="150" y="20" width="80" height="90" rx="8" fill="#16407a"/><text x="190" y="70" font-size="12" text-anchor="middle" fill="#cfe3f2" font-family="monospace" font-weight="700">L298N</text>${[0,1,2,3].map(i=>`<rect x="${160+i*16}" y="102" width="8" height="10" fill="#e8ab47"/>`).join('')}</svg>`,
+  buzzer:`<svg viewBox="0 0 200 150" width="180"><circle cx="100" cy="70" r="50" fill="#101d3a"/><circle cx="100" cy="70" r="30" fill="#3a4763"/><circle cx="100" cy="70" r="10" fill="#e8ab47"/>${[1,2,3].map(i=>`<path d="M${100+50+i*14} 70 a${i*10} ${i*10} 0 0 1 -${i*4} ${i*9}" fill="none" stroke="#17a099" stroke-width="2.5" opacity="${0.8-i*0.2}"/>`).join('')}</svg>`,
+  rgb:`<svg viewBox="0 0 200 150" width="180"><circle cx="100" cy="70" r="42" fill="#fff" stroke="#dee6ee" stroke-width="4"/><path d="M100 30 A40 40 0 0 1 135 90 L100 70 Z" fill="#e05a5a"/><path d="M135 90 A40 40 0 0 1 65 90 L100 70 Z" fill="#4caf6a"/><path d="M65 90 A40 40 0 0 1 100 30 L100 70 Z" fill="#4a7fd6"/><line x1="90" y1="112" x2="80" y2="145" stroke="#9aa0ac" stroke-width="5" stroke-linecap="round"/><line x1="100" y1="112" x2="100" y2="145" stroke="#9aa0ac" stroke-width="5" stroke-linecap="round"/><line x1="110" y1="112" x2="120" y2="145" stroke="#9aa0ac" stroke-width="5" stroke-linecap="round"/></svg>`,
+  relay:`<svg viewBox="0 0 220 140" width="200"><rect x="20" y="20" width="180" height="100" rx="10" fill="#eef3f8" stroke="#9aa6bc" stroke-width="3"/><rect x="120" y="35" width="70" height="70" rx="6" fill="#3a4763"/><circle cx="50" cy="45" r="10" fill="#16407a"/><circle cx="50" cy="95" r="10" fill="#c95555"/><text x="90" y="128" font-size="10.5" text-anchor="middle" fill="#5f6b83" font-family="sans-serif">low voltage in → high voltage out</text></svg>`,
+  serial:`<svg viewBox="0 0 240 150" width="220"><rect x="10" y="10" width="220" height="130" rx="10" fill="#0c1527"/><text x="26" y="34" font-size="11" fill="#7d9a76" font-family="monospace">Distance: 32 cm</text><text x="26" y="54" font-size="11" fill="#7d9a76" font-family="monospace">Distance: 31 cm</text><text x="26" y="74" font-size="11" fill="#ecba63" font-family="monospace">Distance: 8 cm — TOO CLOSE</text><text x="26" y="94" font-size="11" fill="#7d9a76" font-family="monospace">Distance: 29 cm</text></svg>`,
+  func:`<svg viewBox="0 0 240 130" width="220"><rect x="16" y="16" width="208" height="98" rx="10" fill="#0c1527"/><text x="30" y="42" font-size="12" font-family="monospace" fill="#8fd6ce">void blinkTwice() {</text><text x="46" y="62" font-size="12" font-family="monospace" fill="#e6edf3">... blink code ...</text><text x="30" y="82" font-size="12" font-family="monospace" fill="#e6edf3">}</text><text x="30" y="102" font-size="12" font-family="monospace" fill="#6fb1ff">loop() { blinkTwice(); }</text></svg>`,
+  robotline:`<svg viewBox="0 0 240 150" width="220"><rect x="0" y="0" width="240" height="150" fill="#eef3f8"/><path d="M20 20 Q120 60 40 90 T220 130" fill="none" stroke="#1a2540" stroke-width="10" stroke-linecap="round"/><rect x="95" y="70" width="50" height="34" rx="8" fill="#0f6e68"/><circle cx="105" cy="112" r="10" fill="#101d3a"/><circle cx="135" cy="112" r="10" fill="#101d3a"/><circle cx="108" cy="66" r="4" fill="#e8ab47"/><circle cx="132" cy="66" r="4" fill="#e8ab47"/></svg>`,
+  robotobst:`<svg viewBox="0 0 240 150" width="220"><rect x="30" y="60" width="70" height="40" rx="8" fill="#0f6e68"/><circle cx="45" cy="102" r="10" fill="#101d3a"/><circle cx="85" cy="102" r="10" fill="#101d3a"/><circle cx="65" cy="55" r="10" fill="#101d3a" stroke="#8b98b2" stroke-width="3"/><rect x="180" y="40" width="30" height="70" rx="4" fill="#c95555"/>${[1,2,3].map(i=>`<path d="M${75+i*20} 55 q 10 0 15 0" stroke="#e8ab47" stroke-width="2" fill="none" opacity="${0.9-i*0.2}"/>`).join('')}</svg>`,
 };
 
 /* ============================================================
-   SHUFFLE — new order on every load & restart
-============================================================ */
-function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
-
-let slides=[];
-function buildDeck(){
-  const c=shuffle(POOL.circuit),k=shuffle(POOL.parts),p=shuffle(POOL.pins),d=shuffle(POOL.code);
-  const leftovers=shuffle([...c.slice(2),...k.slice(2),...p.slice(2),...d.slice(2)]).slice(0,4);
-  const quiz=(data,label)=>({type:'quiz',data:{...data,opts:shuffle(data.opts)},label});
-  slides=[
-    {type:'cover'},
-    /* ------ PART 1: the brain ------ */
-    {type:'content',icon:'chip',kicker:'Lesson 1 · Dasar',title:'What is a microcontroller?',titleId:'Apa itu mikrokontroler?',
-      photoKey:'chip',fb:'chip',cap:['The ATmega328P — the chip inside Arduino Uno','ATmega328P — chip di dalam Arduino Uno'],
-      lead:{en:'A complete tiny computer on one chip — smaller than your thumb, but it thinks, remembers and controls things.',id:'Komputer utuh dalam satu chip — lebih kecil dari ibu jarimu, tapi bisa berpikir, mengingat dan mengendalikan.'},
-      points:[['It runs a program you give it','Ia menjalankan program yang kamu beri'],
-              ['It reads inputs — buttons, sensors, light','Ia membaca input — tombol, sensor, cahaya'],
-              ['It controls outputs — LEDs, motors, sound','Ia mengendalikan output — LED, motor, suara'],
-              ['It hides inside toys, cars, TVs and robots','Ia ada di dalam mainan, mobil, TV dan robot']]},
-    {type:'stats'},
-    {type:'content',icon:'board',kicker:'Lesson 2 · Alat',title:'What is Arduino?',titleId:'Apa itu Arduino?',
-      photoKey:'uno',fb:'board',cap:['A real Arduino Uno R3 board','Papan Arduino Uno R3 asli'],
-      lead:{en:'A friendly board built around that chip — it makes the microcontroller easy for everyone.',id:'Papan ramah yang dibangun di sekitar chip itu — membuat mikrokontroler mudah untuk semua orang.'},
-      points:[['Connect with one USB cable','Hubungkan dengan satu kabel USB'],
-              ['Program it with simple code','Program dengan kode sederhana'],
-              ['Build circuits without soldering','Rakit rangkaian tanpa menyolder']],
-      pro:['Arduino was born in Italy in 2005 and is named after a bar (named after a king!). Millions of boards are used worldwide.','Arduino lahir di Italia tahun 2005 dan dinamai dari sebuah kafe (yang dinamai dari seorang raja!).']},
-    /* ------ PART 2: electricity ------ */
-    {type:'content',icon:'bolt',kicker:'Lesson 3 · Listrik',title:'Electricity = water in a pipe',titleId:'Listrik = air dalam pipa',
-      svg:'water',
-      lead:{en:'Three words explain almost everything about electricity. Engineers use this exact picture.',id:'Tiga kata menjelaskan hampir semua tentang listrik. Insinyur pun memakai gambaran ini.'},
-      points:[['Voltage (V) — the push, like water pressure','Tegangan (V) — dorongan, seperti tekanan air'],
-              ['Current (A) — how much flows','Arus (A) — berapa banyak yang mengalir'],
-              ['Resistance (Ω) — what slows it, like a narrow pipe','Hambatan (Ω) — yang memperlambat, seperti pipa sempit']]},
-    {type:'gameCircuit'},
-    quiz(c[0],'Checkpoint 1'),quiz(c[1],'Checkpoint 1'),
-    {type:'ohmlaw'},
-    {type:'gameOhm'},
-    /* ------ PART 3: components ------ */
-    {type:'content',icon:'wave',kicker:'Lesson 4 · Komponen',title:'The resistor',titleId:'Resistor',
-      photoKey:'resistors',fb:'resistor',cap:['Real resistors — the stripes are a secret color code','Resistor asli — garisnya adalah kode warna rahasia'],
-      lead:{en:'A resistor limits how much current flows — the bodyguard of your circuit.',id:'Resistor membatasi arus yang mengalir — pengawal rangkaianmu.'},
-      points:[['Without it, an LED can burn out instantly','Tanpanya, LED bisa langsung terbakar'],
-              ['Colored bands encode its value in ohms (Ω)','Pita warna menyandikan nilainya dalam ohm (Ω)'],
-              ['Bigger ohms = smaller current','Ohm lebih besar = arus lebih kecil']],
-      pro:['Engineers read the stripes like a barcode: brown-black-red means 1000 Ω.','Insinyur membaca garisnya seperti barcode: cokelat-hitam-merah berarti 1000 Ω.']},
-    {type:'content',icon:'bulb',ic:'amber',kicker:'Lesson 5 · Komponen',title:'The LED — light',titleId:'LED — si lampu',
-      photoKey:'leds',fb:'led',cap:['Real LEDs — note the long and short legs','LED asli — perhatikan kaki panjang dan pendek'],
-      lead:{en:'An LED turns electricity into light — but only in one direction. LED = Light Emitting Diode.',id:'LED mengubah listrik jadi cahaya — tapi hanya satu arah. LED = Light Emitting Diode.'},
-      points:[['Long leg = plus (+)','Kaki panjang = positif (+)'],
-              ['Short leg = minus (–)','Kaki pendek = negatif (–)'],
-              ['Backwards, it will not light','Terbalik, ia tidak akan menyala'],
-              ['It always needs a resistor friend','Ia selalu butuh teman resistor']]},
-    {type:'gamePolarity'},
-    {type:'gameID'},
-    quiz(k[0],'Checkpoint 2'),quiz(k[1],'Checkpoint 2'),
-    /* ------ PART 4: tools & pins ------ */
-    {type:'content',icon:'grid',kicker:'Lesson 6 · Alat',title:'The breadboard',titleId:'Papan breadboard',
-      photoKey:'bread',fb:'bread',cap:['A 400-point breadboard — 400 holes for your ideas','Breadboard 400 titik — 400 lubang untuk idemu'],
-      lead:{en:'Push parts into holes to build circuits — reusable, fast, no soldering.',id:'Tancapkan komponen ke lubang untuk merakit — bisa dipakai ulang, cepat, tanpa solder.'},
-      points:[['Holes in the same column are connected inside','Lubang di kolom sama terhubung di dalam'],
-              ['The middle gap splits the two halves','Celah tengah memisahkan dua sisi'],
-              ['Perfect for testing ideas safely','Sempurna untuk menguji ide dengan aman']]},
-    {type:'content',icon:'shield',kicker:'Lesson 7 · Alat',title:'Jumper wires & safety',titleId:'Kabel jumper & keselamatan',
-      photoKey:'jumpers',fb:'wires',cap:['Jumper wires — the roads of your circuit','Kabel jumper — jalan raya rangkaianmu'],
-      lead:{en:'Jumper wires connect everything. Arduino uses only 5 volts — safe to touch — but good habits matter.',id:'Kabel jumper menghubungkan semuanya. Arduino hanya 5 volt — aman disentuh — tapi kebiasaan baik itu penting.'},
-      points:[['Unplug USB before changing wires','Cabut USB sebelum mengubah kabel'],
-              ['Never connect 5V straight to GND','Jangan hubungkan 5V langsung ke GND'],
-              ['Check LED direction before power on','Periksa arah LED sebelum menyalakan'],
-              ['Keep drinks away from the desk','Jauhkan minuman dari meja kerja']]},
-    {type:'content',icon:'plug',kicker:'Lesson 8 · Pin',title:'The 4 pin families',titleId:'4 keluarga pin',
-      svg:'pins',
-      lead:{en:'Pins are the metal legs where we connect wires. Each family has its own job.',id:'Pin adalah kaki logam tempat menyambung kabel. Tiap keluarga punya tugas sendiri.'},
-      points:[['Power: 5V, 3.3V, GND, VIN — give electricity','Daya: 5V, 3,3V, GND, VIN — memberi listrik'],
-              ['Digital 0–13: ON or OFF, like a switch','Digital 0–13: NYALA atau MATI, seperti saklar'],
-              ['Analog A0–A5: read sensor values 0–1023','Analog A0–A5: baca nilai sensor 0–1023'],
-              ['PWM (~): dim and fade — fake analog out','PWM (~): redup dan pudar — analog palsu']],
-      pro:['The Uno has 14 digital pins, 6 analog inputs, and 6 PWM pins — 20 ways to talk to the world.','Uno punya 14 pin digital, 6 input analog, dan 6 pin PWM — 20 cara bicara dengan dunia.']},
-    {type:'gamePWM'},
-    {type:'gameMatch'},
-    quiz(p[0],'Checkpoint 3'),quiz(p[1],'Checkpoint 3'),
-    /* ------ PART 5: code ------ */
-    {type:'content',icon:'binary',ic:'navy',kicker:'Lesson 9 · Digital',title:'Speak computer: 0 and 1',titleId:'Bahasa komputer: 0 dan 1',
-      svg:'binary',
-      lead:{en:'Deep inside, the chip only knows two things: ON and OFF. HIGH = 1, LOW = 0. Everything else is built from these.',id:'Jauh di dalam, chip hanya tahu dua hal: NYALA dan MATI. HIGH = 1, LOW = 0. Semua hal lain dibangun dari ini.'},
-      points:[['1 bit = one ON/OFF answer','1 bit = satu jawaban NYALA/MATI'],
-              ['4 bits can count from 0 to 15','4 bit bisa menghitung 0 sampai 15'],
-              ['8 bits = 1 byte = numbers 0 to 255','8 bit = 1 byte = angka 0 sampai 255'],
-              ['That is why PWM uses 0–255!','Itulah kenapa PWM memakai 0–255!']]},
-    {type:'gameBinary'},
-    {type:'blinkIntro'},
-    {type:'gameBlink'},
-    {type:'codeVocab'},
-    {type:'gameBug'},
-    quiz(d[0],'Checkpoint 4'),quiz(d[1],'Checkpoint 4'),
-    {type:'gameOrder'},
-    /* ------ PART 6: the bigger world ------ */
-    {type:'content',icon:'eye',kicker:'Lesson 10 · Sensor',title:'Sensors — robot senses',titleId:'Sensor — indra robot',
-      photoKey:'sonar',fb:'sensor',cap:['HC-SR04 — it sees with sound, like a bat','HC-SR04 — melihat dengan suara, seperti kelelawar'],
-      lead:{en:'Sensors let your Arduino feel the world: distance, light, heat, touch.',id:'Sensor membuat Arduino-mu merasakan dunia: jarak, cahaya, panas, sentuhan.'},
-      points:[['Ultrasonic sensor — measures distance with echo','Sensor ultrasonik — mengukur jarak dengan gema'],
-              ['Light sensor (LDR) — feels brightness','Sensor cahaya (LDR) — merasakan terang'],
-              ['Button — feels a press','Tombol — merasakan tekanan']],
-      pro:['Sound travels 343 meters per second. Your Arduino times the echo in microseconds to compute distance.','Suara melaju 343 meter per detik. Arduino menghitung gema dalam mikrodetik untuk mengukur jarak.']},
-    {type:'gameSensor'},
-    {type:'projects'},
-    {type:'roadmap'},
-    /* ------ FINAL ------ */
-    quiz(leftovers[0],'Final round'),quiz(leftovers[1],'Final round'),quiz(leftovers[2],'Final round'),quiz(leftovers[3],'Final round'),
-    {type:'results'},
-  ];
-}
-
-/* ============================================================
-   STATE & SCORING — big points if right, small if wrong
-============================================================ */
-let cur=0,score=0,firstTry=0,quizCount=0,gamesCount=11;
-let answered={},attempts={},g={};
-const GAME_MAX=100*10+50; // 10 games @100 + blink 50
-let MAX=0;
-
-function addPoints(n,small){
-  score+=n;
-  document.getElementById('scoreVal').textContent=score;
-  const chip=document.getElementById('scoreChip');
-  chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');
-  const f=document.createElement('span');
-  f.className='float-pts '+(small?'small':'big');f.textContent='+'+n;
-  chip.appendChild(f);setTimeout(()=>f.remove(),1100);
-}
-function tieredPts(tries){return tries===1?100:(tries===2?60:30);}
-
-/* ============================================================
-   SHARED RENDER HELPERS
+   HELPERS
 ============================================================ */
 function el(h){const d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild;}
-function pointsList(arr){return `<ul class="points">${arr.map(([en,id])=>`<li><span class="tick">${I.tick}</span><span><b>${en}</b><span class="id">${id}</span></span></li>`).join('')}</ul>`;}
+function pointsList(arr){return `<ul class="points">${arr.map(([en,idt])=>`<li><span class="tick">${I.tick}</span><span><b>${en}</b><span class="id">${idt}</span></span></li>`).join('')}</ul>`;}
 function proBox(pro){return pro?`<div class="pro"><span class="pb">PRO FACT</span><span>${pro[0]}<span class="id">${pro[1]}</span></span></div>`:'';}
 function okFb(fbEl,txtEn,txtId){fbEl.className='feedback ok show';fbEl.querySelector('.fi').innerHTML=I.tick;fbEl.querySelector('.ft').textContent=txtEn;fbEl.querySelector('.fx').textContent=txtId;}
 function noFb(fbEl,txtEn,txtId){fbEl.className='feedback no show';fbEl.querySelector('.fi').textContent='!';fbEl.querySelector('.ft').textContent=txtEn;fbEl.querySelector('.fx').textContent=txtId;}
 const FBOX=id=>`<div class="feedback" id="${id}"><span class="fi"></span><span><b class="ft"></b><span class="id fx"></span></span></div>`;
-
-const SVGS = {
-  water:`<svg viewBox="0 0 260 130" width="250"><rect x="14" y="34" width="60" height="62" rx="8" fill="#101d3a"/><text x="44" y="70" fill="#84ddd3" font-size="12" font-weight="700" font-family="monospace" text-anchor="middle">PUMP</text><path d="M74 50 h60 a10 10 0 0 1 10 10 v10" fill="none" stroke="#178f87" stroke-width="12" stroke-linecap="round"/><path d="M144 82 v6 a10 10 0 0 0 10 10 h50" fill="none" stroke="#178f87" stroke-width="7" stroke-linecap="round"/><text x="118" y="30" fill="#5f6b83" font-size="11" font-family="sans-serif">wide pipe = easy flow</text><text x="148" y="120" fill="#5f6b83" font-size="11" font-family="sans-serif">narrow pipe = resistance</text></svg>`,
-  pins:`<svg viewBox="0 0 260 150" width="250"><rect x="30" y="20" width="200" height="110" rx="10" fill="#0f6e68"/><rect x="52" y="24" width="156" height="12" rx="3" fill="#101d3a"/><rect x="52" y="114" width="156" height="12" rx="3" fill="#101d3a"/>${[0,1,2,3,4,5,6].map(i=>`<rect x="${58+i*21}" y="26" width="6" height="8" fill="#e3a23b"/><rect x="${58+i*21}" y="116" width="6" height="8" fill="#84ddd3"/>`).join('')}<text x="130" y="14" fill="#5f6b83" font-size="11" text-anchor="middle" font-family="sans-serif">digital pins (0–13)</text><text x="130" y="145" fill="#5f6b83" font-size="11" text-anchor="middle" font-family="sans-serif">power + analog pins</text><text x="130" y="80" fill="#d3f2ee" font-size="12" text-anchor="middle" font-family="'Space Grotesk'" font-weight="700">UNO</text></svg>`,
-  binary:`<svg viewBox="0 0 260 130" width="240">${[1,0,1,1].map((b,i)=>`<rect x="${20+i*58}" y="26" width="46" height="58" rx="9" fill="${b?'#178f87':'#dde5ec'}"/><text x="${43+i*58}" y="64" fill="${b?'#fff':'#8fa0b5'}" font-size="28" font-weight="700" font-family="'Space Grotesk'" text-anchor="middle">${b}</text><text x="${43+i*58}" y="104" fill="#5f6b83" font-size="12" text-anchor="middle" font-family="sans-serif">${[8,4,2,1][i]}</text>`).join('')}<text x="130" y="124" fill="#178f87" font-size="13" font-weight="700" text-anchor="middle" font-family="'Space Grotesk'">1011 = 8+2+1 = 11</text></svg>`,
-};
+function tieredPts(t){return t===1?100:(t===2?60:30);}
 
 /* ============================================================
-   SLIDE RENDERERS
+   CONTENT DATA — theory slides
 ============================================================ */
-function rCover(){
-  return `<section class="slide"><div class="dark-panel cover">
-    <div class="blob b1"></div><div class="blob b2"></div>
-    <div class="eyebrow"><span class="dot"></span>Trial Lesson · Pelajaran Percobaan</div>
-    <h1>Microcontrollers<br>&amp; Arduino</h1>
-    <div class="h1-id">Mikrokontroler &amp; Arduino</div>
-    <p>A full journey from zero: real electronics, real photos, real code — circuits, resistors, LEDs, pins, binary, PWM and your first program. Play ${gamesCount} games, answer ${quizCount} quizzes, collect points.
-      <br><span class="id">Perjalanan lengkap dari nol: elektronika nyata, foto nyata, kode nyata. Mainkan ${gamesCount} gim, jawab ${quizCount} kuis, kumpulkan poin.</span></p>
-    <div class="cta-row">
-      <button class="btn btn-primary" onclick="go(1)">Start lesson · Mulai ${I.arrow}</button>
-      <span class="meta-pill">${quizCount} quizzes · ${gamesCount} games</span>
-      <span class="meta-pill">New question order every run · Urutan soal baru tiap sesi</span>
-    </div>
-  </div></section>`;
-}
+const CONTENT = {
+  welcome:{icon:'rocket',ic:'amber',kicker:'Part 2 · Lanjutan',title:'Welcome back, maker',titleId:'Selamat datang kembali, maker',
+    lead:{en:'You already closed circuits, lit LEDs and wrote Blink. Now your Arduino learns to feel the world and move things in it.',id:'Kamu sudah menutup rangkaian, menyalakan LED dan menulis Blink. Sekarang Arduino-mu belajar merasakan dunia dan menggerakkan benda di dalamnya.'},
+    points:[['Part 2 covers sensors — inputs that feel the world','Bagian 2 membahas sensor — input yang merasakan dunia'],
+            ['Then actuators — outputs that move and make sound','Lalu aktuator — output yang bergerak dan bersuara'],
+            ['Then leveling up your code: variables, logic, functions','Lalu naik level kodingmu: variabel, logika, fungsi'],
+            ['Finally: real mini-robots that sense, think and act','Terakhir: robot mini nyata yang merasakan, berpikir dan bertindak']]},
+  analog:{icon:'wave',kicker:'Lesson 13 · Input analog',title:'Analog input: the in-between values',titleId:'Input analog: nilai di antara',
+    svg:'adc',
+    lead:{en:'Digital only knows ON/OFF. But the world is not binary — light, sound and temperature slide smoothly. analogRead() captures that.',id:'Digital hanya tahu NYALA/MATI. Tapi dunia tidak biner — cahaya, suara dan suhu berubah halus. analogRead() menangkap itu.'},
+    points:[['analogRead(A0) returns a number from 0 to 1023','analogRead(A0) mengembalikan angka 0 sampai 1023'],
+            ['0 = 0 volts, 1023 = 5 volts, everything between is in-between','0 = 0 volt, 1023 = 5 volt, di antaranya nilai tengah'],
+            ['This is called the ADC — analog-to-digital converter','Ini disebut ADC — pengubah analog ke digital'],
+            ['Only the A0–A5 pins can do this trick','Hanya pin A0–A5 yang bisa melakukan ini']]},
+  divider:{icon:'bolt',kicker:'Lesson 14 · Teori',title:'Voltage dividers: how sensors "talk"',titleId:'Pembagi tegangan: cara sensor "bicara"',
+    svg:'divider',
+    lead:{en:'Most simple sensors do not send numbers — they change resistance. A voltage divider turns that resistance change into a voltage your Arduino can read.',id:'Sebagian besar sensor sederhana tidak mengirim angka — mereka mengubah hambatan. Pembagi tegangan mengubah perubahan hambatan itu jadi tegangan yang bisa dibaca Arduino.'},
+    points:[['Pair a fixed resistor with your sensor','Pasangkan resistor tetap dengan sensormu'],
+            ['The middle point is read by an analog pin','Titik tengah dibaca oleh pin analog'],
+            ['More sensor resistance = different voltage at the middle','Hambatan sensor berubah = tegangan di tengah berubah'],
+            ['This trick powers LDRs, potentiometers and more','Trik ini menggerakkan LDR, potensiometer dan banyak lagi']]},
+  ldr:{icon:'wave',ic:'amber',kicker:'Lesson 15 · Sensor',title:'LDR: the light-feeling resistor',titleId:'LDR: resistor perasa cahaya',
+    fb:FB.sensor,photoKey:null,svg:null,useBox:true,
+    lead:{en:'A photoresistor (LDR) changes its resistance with brightness — bright light lowers resistance, darkness raises it.',id:'Fotoresistor (LDR) mengubah hambatannya sesuai kecerahan — cahaya terang menurunkan hambatan, gelap menaikkannya.'},
+    points:[['Bright light → low resistance → higher analogRead()','Cahaya terang → hambatan rendah → analogRead() lebih tinggi'],
+            ['Darkness → high resistance → lower analogRead()','Gelap → hambatan tinggi → analogRead() lebih rendah'],
+            ['Perfect for night-lights and light alarms','Cocok untuk lampu malam dan alarm cahaya']]},
+  button:{icon:'plug',kicker:'Lesson 16 · Input digital',title:'Push button & the pull-down resistor',titleId:'Tombol tekan & resistor pull-down',
+    svg:'button',
+    lead:{en:'A button alone leaves the pin "floating" — reading random noise. A pull-down resistor gives it a clear default: LOW until pressed.',id:'Tombol saja membuat pin "mengambang" — membaca noise acak. Resistor pull-down memberi nilai jelas: LOW sampai ditekan.'},
+    points:[['Without the resistor, readings flicker randomly','Tanpa resistor, pembacaan berkedip acak'],
+            ['The resistor quietly connects the pin to GND','Resistor diam-diam menghubungkan pin ke GND'],
+            ['Press the button → pin jumps to HIGH','Tekan tombol → pin melompat ke HIGH'],
+            ['Many boards also offer a built-in INPUT_PULLUP mode','Banyak papan juga punya mode INPUT_PULLUP bawaan']]},
+  dht:{icon:'wave',kicker:'Lesson 17 · Sensor',title:'DHT11: temperature & humidity',titleId:'DHT11: suhu & kelembapan',
+    photoKey:'dht',
+    lead:{en:'One small sensor, two readings at once: temperature in °C and humidity in %. It talks over a single digital wire using a special protocol.',id:'Satu sensor kecil, dua bacaan sekaligus: suhu dalam °C dan kelembapan dalam %. Ia bicara lewat satu kabel digital dengan protokol khusus.'},
+    points:[['Reads roughly every 1–2 seconds — it is a slow sensor','Membaca kira-kira tiap 1–2 detik — sensor yang lambat'],
+            ['Needs a library (DHT.h) to decode its signal','Butuh pustaka (DHT.h) untuk menerjemahkan sinyalnya'],
+            ['Great for greenhouses, weather stations, smart fans','Cocok untuk rumah kaca, stasiun cuaca, kipas pintar']]},
+  sonar:{icon:'wave',kicker:'Lesson 18 · Sensor',title:'HC-SR04: seeing with sound',titleId:'HC-SR04: melihat dengan suara',
+    photoKey:'sonar',
+    lead:{en:'The sensor shouts an ultrasonic click through Trig, then times how long the Echo takes to bounce back — exactly like a bat.',id:'Sensor "berteriak" ultrasonik lewat Trig, lalu menghitung waktu Echo memantul kembali — persis seperti kelelawar.'},
+    points:[['Trig pin sends a short ultrasonic pulse','Pin Trig mengirim pulsa ultrasonik singkat'],
+            ['Echo pin measures the round-trip time','Pin Echo mengukur waktu pulang-pergi'],
+            ['distance = time × 0.034 ÷ 2 (in centimeters)','jarak = waktu × 0,034 ÷ 2 (dalam sentimeter)'],
+            ['Great for parking sensors and obstacle-avoiding robots','Cocok untuk sensor parkir dan robot penghindar rintangan']]},
+  pir:{icon:'eye',kicker:'Lesson 19 · Sensor',title:'PIR: feeling movement',titleId:'PIR: merasakan gerakan',
+    svg:'pir',
+    lead:{en:'A Passive Infrared sensor detects the heat that living bodies radiate — when a warm shape moves across its view, it outputs HIGH.',id:'Sensor Passive Infrared mendeteksi panas yang dipancarkan tubuh hidup — saat bentuk hangat bergerak melintas, ia mengeluarkan HIGH.'},
+    points:[['Detects change in infrared heat, not motion itself','Mendeteksi perubahan panas inframerah, bukan gerakan itu sendiri'],
+            ['Great for automatic lights and security alarms','Cocok untuk lampu otomatis dan alarm keamanan'],
+            ['Has a short warm-up time after power-on','Punya waktu pemanasan singkat setelah dinyalakan']]},
+  servo:{icon:'plug',kicker:'Lesson 20 · Aktuator',title:'Servo motor: precise angles',titleId:'Motor servo: sudut yang presisi',
+    photoKey:'servo',
+    lead:{en:'A servo does not just spin — it holds an exact angle, from 0° to 180°, based on the width of a pulse you send it.',id:'Servo tidak sekadar berputar — ia menahan sudut tepat, dari 0° sampai 180°, berdasarkan lebar pulsa yang kamu kirim.'},
+    points:[['Use the Servo.h library — myServo.write(angle)','Gunakan pustaka Servo.h — myServo.write(sudut)'],
+            ['Three wires: power, ground, and signal','Tiga kabel: daya, ground, dan sinyal'],
+            ['Perfect for robot arms, steering, and camera mounts','Cocok untuk lengan robot, kemudi, dan dudukan kamera']]},
+  motor:{icon:'bolt',kicker:'Lesson 21 · Aktuator',title:'DC motor & the L298N driver',titleId:'Motor DC & driver L298N',
+    svg:'motor',
+    lead:{en:'Arduino pins are too weak to power a motor directly. A motor driver acts as a bridge — it uses a small signal to switch a big current.',id:'Pin Arduino terlalu lemah untuk menggerakkan motor langsung. Driver motor menjadi jembatan — memakai sinyal kecil untuk menyalakan arus besar.'},
+    points:[['IN1/IN2 pins set the direction of spin','Pin IN1/IN2 menentukan arah putaran'],
+            ['An ENA pin (PWM) controls the speed','Pin ENA (PWM) mengatur kecepatan'],
+            ['The motor gets its own separate battery power','Motor mendapat daya baterai terpisah sendiri'],
+            ['This is exactly how robot wheels are driven','Beginilah persisnya roda robot digerakkan']]},
+  buzzer:{icon:'wave',kicker:'Lesson 22 · Aktuator',title:'Buzzer & the tone() command',titleId:'Buzzer & perintah tone()',
+    svg:'buzzer',
+    lead:{en:'A piezo buzzer vibrates at whatever frequency you ask — tone(pin, frequency) turns numbers into music and alarms.',id:'Buzzer piezo bergetar pada frekuensi berapa pun yang kamu minta — tone(pin, frekuensi) mengubah angka jadi musik dan alarm.'},
+    points:[['Higher frequency (Hz) = higher pitch','Frekuensi (Hz) lebih tinggi = nada lebih tinggi'],
+            ['tone(9, 440) plays the musical note A','tone(9, 440) memainkan nada musik A'],
+            ['noTone(pin) stops the sound','noTone(pin) menghentikan suara']]},
+  rgb:{icon:'bulb',ic:'amber',kicker:'Lesson 23 · Aktuator',title:'RGB LED: mixing light with PWM',titleId:'LED RGB: mencampur cahaya dengan PWM',
+    svg:'rgb',
+    lead:{en:'An RGB LED is really three LEDs in one — red, green and blue. Dim each one with PWM and your eyes blend them into any color.',id:'LED RGB sebenarnya tiga LED dalam satu — merah, hijau, biru. Redupkan tiap warna dengan PWM dan matamu mencampurnya jadi warna apa pun.'},
+    points:[['analogWrite() on three pins — one per color','analogWrite() pada tiga pin — satu tiap warna'],
+            ['Full red + full green = yellow','Merah penuh + hijau penuh = kuning'],
+            ['All three at max = white light','Ketiganya maksimal = cahaya putih']]},
+  relay:{icon:'shield',kicker:'Lesson 24 · Aktuator',title:'Relay: switching big power safely',titleId:'Relay: menyalakan daya besar dengan aman',
+    svg:'relay',
+    lead:{en:'A relay is an electric switch controlled by a tiny signal — it lets your 5V Arduino safely turn lamps, fans, even 220V appliances on and off.',id:'Relay adalah saklar listrik yang dikendalikan sinyal kecil — membuat Arduino 5V-mu bisa menyalakan lampu, kipas, bahkan alat 220V dengan aman.'},
+    points:[['A small coil pulls a real mechanical switch','Kumparan kecil menarik saklar mekanis sungguhan'],
+            ['It fully separates low-voltage and high-voltage sides','Ia sepenuhnya memisahkan sisi tegangan rendah dan tinggi'],
+            ['digitalWrite(relayPin, HIGH) — click! — power flows','digitalWrite(relayPin, HIGH) — klik! — daya mengalir']],
+    pro:['Never touch the high-voltage side yourself — leave mains wiring to a trained adult.','Jangan sentuh sisi tegangan tinggi sendiri — serahkan kabel listrik utama ke orang dewasa terlatih.']},
+  vars:{icon:'binary',ic:'navy',kicker:'Lesson 25 · Kode',title:'Variables: giving data a name',titleId:'Variabel: memberi nama pada data',
+    lead:{en:'A variable is a labeled box that stores a value — a sensor reading, a distance, a color. Name it once, use it everywhere.',id:'Variabel adalah kotak berlabel yang menyimpan nilai — bacaan sensor, jarak, warna. Beri nama sekali, pakai di mana saja.'},
+    points:[['int distance; — creates a box for whole numbers','int distance; — membuat kotak untuk bilangan bulat'],
+            ['distance = analogRead(A0); stores the reading','distance = analogRead(A0); menyimpan bacaan'],
+            ['float is for numbers with decimals, like 3.14','float untuk angka berdesimal, seperti 3,14'],
+            ['Good names make code easy to read later','Nama yang baik membuat kode mudah dibaca nanti']]},
+  ifelse:{icon:'code',ic:'navy',kicker:'Lesson 26 · Kode',title:'if / else: teaching Arduino to decide',titleId:'if / else: mengajari Arduino mengambil keputusan',
+    lead:{en:'Sensors are useless without decisions. if checks a condition; else handles everything else. This is how machines "think".',id:'Sensor tak berguna tanpa keputusan. if memeriksa kondisi; else menangani sisanya. Begini caranya mesin "berpikir".'},
+    points:[['if (condition) { ... } runs only when true','if (kondisi) { ... } berjalan hanya jika benar'],
+            ['else { ... } runs when the condition is false','else { ... } berjalan jika kondisi salah'],
+            ['Curly braces { } group the steps together','Kurung kurawal { } mengelompokkan langkah-langkah']]},
+  logic:{icon:'code',ic:'navy',kicker:'Lesson 27 · Kode',title:'Comparison & logic operators',titleId:'Operator perbandingan & logika',
+    lead:{en:'A handful of small symbols let your code compare numbers and combine conditions — the building blocks of every decision.',id:'Beberapa simbol kecil membuat kodemu bisa membandingkan angka dan menggabungkan kondisi — dasar dari setiap keputusan.'},
+    points:[['> less/greater than, == equal to, != not equal','> kurang/lebih dari, == sama dengan, != tidak sama'],
+            ['&& means AND — both conditions must be true','&& berarti DAN — kedua kondisi harus benar'],
+            ['|| means OR — at least one must be true','|| berarti ATAU — setidaknya satu harus benar'],
+            ['Watch out: = assigns, == compares — do not mix them up','Hati-hati: = memberi nilai, == membandingkan — jangan tertukar']]},
+  loops:{icon:'binary',ic:'navy',kicker:'Lesson 28 · Kode',title:'for loops: doing things many times',titleId:'Perulangan for: mengulang banyak kali',
+    lead:{en:'Instead of copy-pasting the same line ten times, a for loop repeats it for you — with a counter that changes each round.',id:'Daripada menyalin baris yang sama sepuluh kali, perulangan for mengulanginya untukmu — dengan penghitung yang berubah tiap putaran.'},
+    points:[['for (int i=0; i<5; i++) repeats 5 times','for (int i=0; i<5; i++) mengulang 5 kali'],
+            ['i starts, the middle part checks, i++ increases it','i memulai, bagian tengah memeriksa, i++ menambahnya'],
+            ['Great for blinking patterns or cycling through LEDs','Cocok untuk pola kedip atau bergiliran menyalakan LED']]},
+  funcs:{icon:'code',ic:'navy',kicker:'Lesson 29 · Kode',title:'Functions: package your own commands',titleId:'Fungsi: mengemas perintahmu sendiri',
+    svg:'func',
+    lead:{en:'setup() and loop() are functions Arduino gives you. You can write your own — bundle steps into one reusable name.',id:'setup() dan loop() adalah fungsi bawaan Arduino. Kamu bisa membuat sendiri — mengemas langkah-langkah jadi satu nama yang bisa dipakai ulang.'},
+    points:[['void blinkTwice() { ... } defines a new command','void blinkTwice() { ... } membuat perintah baru'],
+            ['Call it anywhere just by writing blinkTwice();','Panggil di mana saja cukup tulis blinkTwice();'],
+            ['Keeps loop() short, clean, and easy to follow','Membuat loop() singkat, rapi, dan mudah diikuti']]},
+  serial:{icon:'eye',kicker:'Lesson 30 · Debug',title:'Serial Monitor: your window into the code',titleId:'Serial Monitor: jendela ke dalam kodemu',
+    svg:'serial',
+    lead:{en:'Serial.print() sends text from Arduino to your computer screen — the best way to see what a sensor is really reading.',id:'Serial.print() mengirim teks dari Arduino ke layar komputermu — cara terbaik melihat apa yang sebenarnya dibaca sensor.'},
+    points:[['Serial.begin(9600); turns the channel on in setup()','Serial.begin(9600); menyalakan jalurnya di setup()'],
+            ['Serial.println(distance); prints a value, then a new line','Serial.println(distance); mencetak nilai, lalu baris baru'],
+            ['Real engineers debug this way every single day','Insinyur sungguhan men-debug seperti ini setiap hari']]},
+  robotintro:{icon:'rocket',ic:'amber',kicker:'Lesson 31 · Robotika',title:'What is a robot? Sense → Think → Act',titleId:'Apa itu robot? Rasakan → Pikirkan → Bertindak',
+    lead:{en:'Strip away the sci-fi: a robot is just a loop. It senses the world, decides what to do, then acts — over and over.',id:'Lepaskan kesan fiksi ilmiahnya: robot hanyalah sebuah perulangan. Ia merasakan dunia, memutuskan apa yang harus dilakukan, lalu bertindak — berulang-ulang.'},
+    points:[['Sense — sensors read distance, light, line position','Rasakan — sensor membaca jarak, cahaya, posisi garis'],
+            ['Think — if/else decides what that reading means','Pikirkan — if/else memutuskan arti bacaan itu'],
+            ['Act — motors, servos or buzzers respond','Bertindak — motor, servo, atau buzzer merespons'],
+            ['loop() repeats this forever, many times a second','loop() mengulang ini selamanya, berkali-kali tiap detik']]},
+  linefollow:{icon:'eye',kicker:'Lesson 32 · Robotika',title:'Line-follower robot logic',titleId:'Logika robot pengikut garis',
+    svg:'robotline',
+    lead:{en:'Two IR sensors under the chassis watch a dark line on a light floor. When one loses the line, the robot steers back onto it.',id:'Dua sensor IR di bawah bodi mengawasi garis gelap di lantai terang. Saat salah satu kehilangan garis, robot berbelok kembali ke atasnya.'},
+    points:[['Left sensor sees the line → steer left','Sensor kiri melihat garis → belok kiri'],
+            ['Right sensor sees the line → steer right','Sensor kanan melihat garis → belok kanan'],
+            ['Both see it → drive straight ahead','Keduanya melihatnya → jalan lurus ke depan']]},
+  obstacle:{icon:'eye',kicker:'Lesson 33 · Robotika',title:'Obstacle-avoider robot',titleId:'Robot penghindar rintangan',
+    svg:'robotobst',
+    lead:{en:'An ultrasonic sensor on the front constantly checks distance. Too close, and the code tells the motors to stop and turn.',id:'Sensor ultrasonik di depan terus-menerus memeriksa jarak. Terlalu dekat, kode memerintahkan motor berhenti dan berbelok.'},
+    points:[['distance > 20 → keep driving forward','jarak > 20 → tetap jalan ke depan'],
+            ['distance <= 20 → stop, reverse a little, turn','jarak <= 20 → berhenti, mundur sedikit, berbelok'],
+            ['This same loop runs on real self-driving cars — just far more complex','Perulangan yang sama berjalan di mobil otonom sungguhan — hanya jauh lebih rumit']]},
+  roadmap:{icon:'flag',kicker:'Lesson 34 · Peta jalan',title:'Your next roadmap',titleId:'Peta jalan berikutnya',
+    lead:{en:'You now know enough to build almost anything small. Here is where a maker goes next.',id:'Kamu sekarang tahu cukup banyak untuk membangun hampir semua hal kecil. Inilah kelanjutan jalur seorang maker.'},
+    points:[['Week 5 — Wi-Fi boards (ESP32) and sending data online','Minggu 5 — Papan Wi-Fi (ESP32) dan mengirim data online'],
+            ['Week 6 — Displays: OLED and LCD screens','Minggu 6 — Layar: OLED dan LCD'],
+            ['Week 7 — Data logging to an SD card','Minggu 7 — Mencatat data ke kartu SD'],
+            ['Week 8 — Your own final project, start to finish','Minggu 8 — Proyek akhirmu sendiri, dari awal sampai selesai']],
+    pro:['Every skill here — sensors, actuators, if/else, functions — is exactly what professional embedded engineers use daily.','Setiap kemampuan di sini — sensor, aktuator, if/else, fungsi — persis yang dipakai insinyur embedded profesional tiap hari.']},
+};
 
-function rContent(s){
-  const side = s.photoKey ? photo(s.photoKey,s.fb,s.cap[0],s.cap[1])
-             : `<div class="visual">${SVGS[s.svg]}</div>`;
+function rContent(key){
+  const s = CONTENT[key];
+  let side;
+  if(s.photoKey) side = photo(s.photoKey, FB.sensor, s.title, s.titleId);
+  else if(s.svg) side = `<div class="visual">${SVGS[s.svg]}</div>`;
+  else side = `<div class="visual">${boxSVG('#16407a', s.title.split(':')[0], 'component', 220,150)}</div>`;
   return `<section class="slide"><div class="card"><div class="split">
     <div>
       <div class="headicon ${s.ic||''}">${I[s.icon]}</div>
@@ -686,453 +570,370 @@ function rContent(s){
   </div></div></section>`;
 }
 
-function rStats(){
-  return `<section class="slide"><div class="card">
-    <div class="headicon navy">${I.chip}</div>
-    <div class="eyebrow"><span class="dot"></span>Lesson 1B · Di dalam otak</div>
-    <h2 class="title">Inside the tiny brain</h2><div class="title-id id">Di dalam otak mungil itu</div>
-    <p class="lead">These numbers sound serious — engineers use them daily. And now you understand them too.
-      <span class="id">/ Angka-angka ini terdengar serius — insinyur memakainya tiap hari. Dan sekarang kamu juga paham.</span></p>
-    <div class="stats">
-      <div class="statcard"><div class="statnum">16 MHz</div><div class="statlbl">16,000,000 ticks per second</div><div class="statid id">16 juta detak per detik</div></div>
-      <div class="statcard"><div class="statnum">32 KB</div><div class="statlbl">Flash memory for your program</div><div class="statid id">Memori Flash untuk programmu</div></div>
-      <div class="statcard"><div class="statnum">5 V</div><div class="statlbl">Runs on just five volts — safe</div><div class="statid id">Berjalan hanya dengan 5 volt — aman</div></div>
-    </div>
-    <div class="pro"><span class="pb">PRO FACT</span><span>32 KB is smaller than one photo on your phone — yet it can run a whole robot.<span class="id">32 KB lebih kecil dari satu foto di ponselmu — tapi bisa menjalankan robot utuh.</span></span></div>
-  </div></section>`;
-}
+/* ============================================================
+   QUIZ DATA (checkpoints — "tests")
+============================================================ */
+const QUIZ = [
+  {q:{en:'analogRead() on pin A0 returns a number in which range?',id:'analogRead() pada pin A0 mengembalikan angka pada rentang mana?'},
+   opts:[{en:'0 to 1023',id:'0 sampai 1023',ok:1},{en:'0 to 5',id:'0 sampai 5'},{en:'0 or 1 only',id:'hanya 0 atau 1'}],
+   exp:{en:'The ADC splits 0–5V into 1024 steps: 0 to 1023.',id:'ADC membagi 0–5V menjadi 1024 langkah: 0 sampai 1023.'}},
+  {q:{en:'In a voltage divider, what does the LDR change?',id:'Pada pembagi tegangan, apa yang diubah LDR?'},
+   opts:[{en:'Its own resistance',id:'Hambatannya sendiri',ok:1},{en:'The Arduino\'s clock speed',id:'Kecepatan clock Arduino'},{en:'The USB cable',id:'Kabel USB'}],
+   exp:{en:'Light changes the LDR\'s resistance, which changes the voltage read at A0.',id:'Cahaya mengubah hambatan LDR, yang mengubah tegangan terbaca di A0.'}},
+  {q:{en:'Why does a button need a pull-down resistor?',id:'Kenapa tombol butuh resistor pull-down?'},
+   opts:[{en:'So the pin has a clear LOW when not pressed',id:'Agar pin punya LOW yang jelas saat tak ditekan',ok:1},{en:'To make the button louder',id:'Agar tombol lebih keras'},{en:'To charge the battery faster',id:'Agar baterai cepat terisi'}],
+   exp:{en:'Without it, the pin "floats" and reads random noise.',id:'Tanpanya, pin "mengambang" dan membaca noise acak.'}},
+  {q:{en:'The HC-SR04 measures distance by timing…',id:'HC-SR04 mengukur jarak dengan menghitung waktu…'},
+   opts:[{en:'How long the echo takes to return',id:'Berapa lama gema kembali',ok:1},{en:'How bright the room is',id:'Seberapa terang ruangan'},{en:'How long the button is held',id:'Berapa lama tombol ditekan'}],
+   exp:{en:'It sends a sound pulse via Trig and times its return via Echo.',id:'Ia mengirim pulsa suara lewat Trig dan menghitung waktu kembalinya lewat Echo.'}},
+  {q:{en:'A servo motor is controlled by…',id:'Motor servo dikendalikan dengan…'},
+   opts:[{en:'A pulse width that sets its angle',id:'Lebar pulsa yang menentukan sudutnya',ok:1},{en:'How loud you shout at it',id:'Seberapa keras kamu berteriak'},{en:'Its own internal battery only',id:'Baterai internalnya sendiri'}],
+   exp:{en:'Servo.write(angle) sends a pulse whose width means "go to this angle."',id:'Servo.write(sudut) mengirim pulsa yang lebarnya berarti "pergi ke sudut ini."'}},
+  {q:{en:'Why does a DC motor need a driver like the L298N?',id:'Kenapa motor DC butuh driver seperti L298N?'},
+   opts:[{en:'Arduino pins are too weak to power a motor directly',id:'Pin Arduino terlalu lemah untuk menggerakkan motor langsung',ok:1},{en:'Motors do not use electricity',id:'Motor tidak memakai listrik'},{en:'It makes the code shorter',id:'Membuat kode lebih pendek'}],
+   exp:{en:'The driver uses a small signal to safely switch a much larger current.',id:'Driver memakai sinyal kecil untuk menyalakan arus yang jauh lebih besar dengan aman.'}},
+  {q:{en:'tone(9, 440) will…',id:'tone(9, 440) akan…'},
+   opts:[{en:'Play the musical note A on pin 9',id:'Memainkan nada musik A di pin 9',ok:1},{en:'Turn pin 9 permanently off',id:'Mematikan pin 9 selamanya'},{en:'Read a sensor on pin 9',id:'Membaca sensor di pin 9'}],
+   exp:{en:'440 Hz is the frequency of the note A above middle C.',id:'440 Hz adalah frekuensi nada A di atas C tengah.'}},
+  {q:{en:'To make yellow on an RGB LED, you mix…',id:'Untuk membuat kuning pada LED RGB, kamu mencampur…'},
+   opts:[{en:'Full red and full green',id:'Merah penuh dan hijau penuh',ok:1},{en:'Full blue only',id:'Biru penuh saja'},{en:'No colors at all',id:'Tanpa warna sama sekali'}],
+   exp:{en:'Red + green light combine to look yellow to our eyes.',id:'Cahaya merah + hijau bergabung terlihat kuning bagi mata kita.'}},
+  {q:{en:'What is the main job of a relay?',id:'Apa tugas utama relay?'},
+   opts:[{en:'Let a small signal switch a high-power circuit safely',id:'Membiarkan sinyal kecil menyalakan rangkaian berdaya besar dengan aman',ok:1},{en:'Store your program',id:'Menyimpan programmu'},{en:'Measure temperature',id:'Mengukur suhu'}],
+   exp:{en:'Its coil pulls a real switch, separating low and high voltage sides.',id:'Kumparannya menarik saklar sungguhan, memisahkan sisi tegangan rendah dan tinggi.'}},
+  {q:{en:'In code, == is used to…',id:'Dalam kode, == dipakai untuk…'},
+   opts:[{en:'Compare two values for equality',id:'Membandingkan dua nilai apakah sama',ok:1},{en:'Assign a new value',id:'Memberi nilai baru'},{en:'Delete a variable',id:'Menghapus variabel'}],
+   exp:{en:'A single = assigns; a double == compares. Mixing them is a classic bug.',id:'Satu = memberi nilai; dua == membandingkan. Tertukar adalah bug klasik.'}},
+  {q:{en:'A for loop like for(int i=0;i<5;i++) repeats…',id:'Perulangan for seperti for(int i=0;i<5;i++) berulang…'},
+   opts:[{en:'5 times',id:'5 kali',ok:1},{en:'Forever',id:'Selamanya'},{en:'0 times',id:'0 kali'}],
+   exp:{en:'i goes 0,1,2,3,4 — five rounds before i<5 becomes false.',id:'i berjalan 0,1,2,3,4 — lima putaran sebelum i<5 menjadi salah.'}},
+  {q:{en:'Writing your own function is useful because…',id:'Menulis fungsi sendiri berguna karena…'},
+   opts:[{en:'It packages steps into one reusable name',id:'Mengemas langkah jadi satu nama yang bisa dipakai ulang',ok:1},{en:'It deletes setup()',id:'Menghapus setup()'},{en:'It slows down the Arduino',id:'Memperlambat Arduino'}],
+   exp:{en:'Call it anywhere with one word instead of repeating code.',id:'Panggil di mana saja dengan satu kata, tanpa mengulang kode.'}},
+];
 
-function rOhmLaw(){
-  return `<section class="slide"><div class="card"><div class="split">
-    <div>
-      <div class="headicon">${I.bolt}</div>
-      <div class="eyebrow"><span class="dot"></span>Lesson 3B · Rumus insinyur</div>
-      <h2 class="title">Ohm's Law — your first formula</h2><div class="title-id id">Hukum Ohm — rumus pertamamu</div>
-      <p class="lead">One little formula connects all three words. Real engineers use it every single day.
-        <span class="id">/ Satu rumus kecil menghubungkan ketiga kata itu. Insinyur sungguhan memakainya setiap hari.</span></p>
-      <div class="formula">I&nbsp;=&nbsp;V&nbsp;÷&nbsp;R</div>
-      ${pointsList([
-        ['More voltage (push) = more current','Tegangan lebih besar = arus lebih besar'],
-        ['More resistance = less current','Hambatan lebih besar = arus lebih kecil'],
-        ['An LED is happy around 20 mA','LED senang di sekitar 20 mA']])}
-    </div>
-    <div class="visual"><svg viewBox="0 0 220 190" width="210">
-      <path d="M110 15 L200 165 L20 165 Z" fill="#e2f1ef" stroke="#178f87" stroke-width="3" stroke-linejoin="round"/>
-      <line x1="63" y1="93" x2="157" y2="93" stroke="#178f87" stroke-width="2.5"/>
-      <line x1="110" y1="93" x2="110" y2="165" stroke="#178f87" stroke-width="2.5"/>
-      <text x="110" y="72" text-anchor="middle" font-size="30" font-weight="700" fill="#0f6e68" font-family="'Space Grotesk'">V</text>
-      <text x="72" y="140" text-anchor="middle" font-size="30" font-weight="700" fill="#0f6e68" font-family="'Space Grotesk'">I</text>
-      <text x="148" y="140" text-anchor="middle" font-size="30" font-weight="700" fill="#0f6e68" font-family="'Space Grotesk'">R</text>
-      <text x="110" y="185" text-anchor="middle" font-size="11" fill="#5f6b83" font-family="sans-serif">cover the one you want — the triangle shows the formula</text>
-    </svg></div>
-  </div></div></section>`;
-}
+/* ============================================================
+   ORDER TASKS ("connect this")
+============================================================ */
+const ORDERS = [
+  {id:'ord-btn',tag:'Task · Wire it up',tagEn:'Wire the button circuit',tagId:'Rangkai sirkuit tombol',
+   leadEn:'Build the loop that reads a button safely: start at the pin, end at ground.',
+   leadId:'Rakit rangkaian yang membaca tombol dengan aman: mulai dari pin, akhiri di ground.',
+   steps:['Digital pin 2','Button leg A','Button leg B','Pull-down resistor','GND']},
+  {id:'ord-motor',tag:'Task · Wire it up',tagEn:'Wire the motor driver',tagId:'Rangkai driver motor',
+   leadEn:'Connect the L298N so it can safely spin one wheel forward.',
+   leadId:'Hubungkan L298N agar bisa memutar satu roda ke depan dengan aman.',
+   steps:['Battery +','L298N power in','IN1 (from Arduino pin)','Motor terminal A','GND (shared)']},
+  {id:'ord-func',tag:'Task · Assemble the code',tagEn:'Assemble the function block',tagId:'Susun blok fungsi',
+   leadEn:'Put these lines of a custom function in the correct order.',
+   leadId:'Susun baris-baris fungsi kustom ini dalam urutan yang benar.',
+   steps:['void blinkTwice() {','digitalWrite(13, HIGH); delay(200);','digitalWrite(13, LOW); delay(200);','digitalWrite(13, HIGH); delay(200);','}']},
+];
 
-/* ---- GAME: circuit ---- */
-function rGameCircuit(){
+/* ============================================================
+   FILL-IN-CODE TASKS ("write this code")
+============================================================ */
+const FILLS = [
+  {id:'fill-alarm',tag:'Task · Write the code',tagEn:'Complete the temperature alarm',tagId:'Lengkapi alarm suhu',
+   leadEn:'The buzzer should turn on when it gets too hot. Pick the missing condition.',
+   leadId:'Buzzer harus menyala saat terlalu panas. Pilih kondisi yang hilang.',
+   pre:'<span class="kw">if</span> (', post:') {\n  digitalWrite(buzzerPin, HIGH);\n}',
+   opts:[{t:'temperature > 30',ok:1},{t:'temperature = 30',ok:0},{t:'buzzerPin > 30',ok:0}],
+   expEn:'temperature > 30 checks the sensor value against a threshold.',expId:'temperature > 30 memeriksa nilai sensor terhadap ambang batas.'},
+  {id:'fill-var',tag:'Task · Write the code',tagEn:'Declare and read a sensor',tagId:'Deklarasikan dan baca sensor',
+   leadEn:'Store the light sensor reading in a properly declared variable.',
+   leadId:'Simpan bacaan sensor cahaya dalam variabel yang dideklarasikan dengan benar.',
+   pre:'', post:' = analogRead(A0);',
+   opts:[{t:'int lightLevel',ok:1},{t:'lightLevel int',ok:0},{t:'analogRead lightLevel',ok:0}],
+   expEn:'Type first, then name: int lightLevel — a labeled box for a whole number.',expId:'Tipe dulu, lalu nama: int lightLevel — kotak berlabel untuk bilangan bulat.'},
+  {id:'fill-led',tag:'Task · Write the code',tagEn:'Turn the LED on when it is dark',tagId:'Nyalakan LED saat gelap',
+   leadEn:'Complete the if/else that reacts to the light sensor.',
+   leadId:'Lengkapi if/else yang merespons sensor cahaya.',
+   pre:'<span class="kw">if</span> (lightLevel < 300) {\n  digitalWrite(ledPin, HIGH);\n} ', post:' {\n  digitalWrite(ledPin, LOW);\n}',
+   opts:[{t:'else',ok:1},{t:'if',ok:0},{t:'loop',ok:0}],
+   expEn:'else runs exactly when the if condition was false.',expId:'else berjalan tepat saat kondisi if salah.'},
+  {id:'fill-tune',tag:'Task · Write the code',tagEn:'Compose a two-note alert',tagId:'Buat nada peringatan dua-nada',
+   leadEn:'Pick the correct second tone() call to complete the alert sound.',
+   leadId:'Pilih panggilan tone() kedua yang benar untuk melengkapi suara peringatan.',
+   pre:'tone(9, 440); delay(200); noTone(9); delay(100);\n', post:'; delay(200); noTone(9);',
+   opts:[{t:'tone(9, 660)',ok:1},{t:'delay(9, 660)',ok:0},{t:'digitalWrite(9, 660)',ok:0}],
+   expEn:'tone(pin, frequency) is the only command that plays a note.',expId:'tone(pin, frekuensi) satu-satunya perintah yang memainkan nada.'},
+  {id:'fill-line',tag:'Task · Write the code',tagEn:'Complete the line-follower decision',tagId:'Lengkapi keputusan pengikut garis',
+   leadEn:'When only the right sensor sees the line, the robot should steer right.',
+   leadId:'Saat hanya sensor kanan yang melihat garis, robot harus berbelok kanan.',
+   pre:'<span class="kw">if</span> (rightSensor == HIGH && leftSensor == LOW) {\n  ', post:';\n}',
+   opts:[{t:'turnRight()',ok:1},{t:'turnLeft()',ok:0},{t:'stopMotors()',ok:0}],
+   expEn:'Right sensor on the line, left sensor off it — steer toward the right.',expId:'Sensor kanan di atas garis, sensor kiri tidak — belok ke arah kanan.'},
+];
+
+/* ============================================================
+   MATCH TASK
+============================================================ */
+const MATCH_SENSORS = {id:'match-sensors',total:5,per:25,
+  pairs:[
+    {en:'LDR (photoresistor)',id_:'LDR (fotoresistor)',en2:'Feels how bright the room is',id2:'Merasakan seberapa terang ruangan'},
+    {en:'Push button',id_:'Tombol tekan',en2:'Feels a finger press',id2:'Merasakan tekanan jari'},
+    {en:'DHT11',id_:'DHT11',en2:'Feels temperature and humidity',id2:'Merasakan suhu dan kelembapan'},
+    {en:'HC-SR04 ultrasonic',id_:'Ultrasonik HC-SR04',en2:'Feels distance using sound echoes',id2:'Merasakan jarak lewat gema suara'},
+    {en:'PIR motion sensor',id_:'Sensor gerak PIR',en2:'Feels the heat of a moving body',id2:'Merasakan panas tubuh yang bergerak'},
+  ]};
+
+/* ============================================================
+   PREDICT / BUG-HUNT TASKS ("not a test" — practice)
+============================================================ */
+const PREDICTS = [
+  {id:'pred-bug',tag:'Task · Bug hunt',tagEn:'One line has a logic bug — find it',tagId:'Satu baris punya bug logika — temukan',
+   leadEn:'The LED should turn on ONLY when it is dark AND the button is pressed. One line is wrong.',
+   leadId:'LED harus menyala HANYA saat gelap DAN tombol ditekan. Satu baris salah.',
+   lines:[
+     {t:'int lightLevel = analogRead(A0);',ok:0},
+     {t:'if (lightLevel < 300 || buttonState == HIGH) {',ok:1},
+     {t:'  digitalWrite(ledPin, HIGH);',ok:0},
+     {t:'}',ok:0}],
+   expEn:'|| means OR — it should be && (AND) so both conditions are required.',
+   expId:'|| berarti ATAU — seharusnya && (DAN) agar kedua kondisi diperlukan.'},
+  {id:'pred-loop',tag:'Task · Predict the pattern',tagEn:'What does this loop blink?',tagId:'Apa pola kedip perulangan ini?',
+   leadEn:'for (int i=0; i<3; i++) { digitalWrite(13,HIGH); delay(200); digitalWrite(13,LOW); delay(200); } — how many times does it blink?',
+   leadId:'for (int i=0; i<3; i++) { digitalWrite(13,HIGH); delay(200); digitalWrite(13,LOW); delay(200); } — berapa kali LED berkedip?',
+   lines:[{t:'2 times',ok:0},{t:'3 times',ok:1},{t:'Forever, non-stop',ok:0}],
+   expEn:'i runs 0,1,2 — exactly three rounds before i<3 becomes false.',
+   expId:'i berjalan 0,1,2 — tepat tiga putaran sebelum i<3 menjadi salah.'},
+  {id:'pred-serial',tag:'Task · Predict the output',tagEn:'What prints to the Serial Monitor?',tagId:'Apa yang tercetak di Serial Monitor?',
+   leadEn:'int d = 8; if (d < 10) { Serial.println("TOO CLOSE"); } else { Serial.println("clear"); } — what prints?',
+   leadId:'int d = 8; if (d < 10) { Serial.println("TOO CLOSE"); } else { Serial.println("clear"); } — apa yang tercetak?',
+   lines:[{t:'"clear"',ok:0},{t:'"TOO CLOSE"',ok:1},{t:'Nothing at all',ok:0}],
+   expEn:'d is 8, and 8 < 10 is true, so the if-branch runs.',
+   expId:'d adalah 8, dan 8 < 10 benar, jadi cabang if yang berjalan.'},
+  {id:'pred-obst',tag:'Task · Decide the action',tagEn:'Choose the right motor action',tagId:'Pilih tindakan motor yang tepat',
+   leadEn:'The ultrasonic sensor reads 12 cm — closer than the 20 cm safety limit. What should the robot do?',
+   leadId:'Sensor ultrasonik membaca 12 cm — lebih dekat dari batas aman 20 cm. Apa yang harus dilakukan robot?',
+   lines:[{t:'Speed up straight ahead',ok:0},{t:'Stop, reverse a little, then turn',ok:1},{t:'Turn off all sensors',ok:0}],
+   expEn:'12 < 20, so the obstacle is too close — the safe reaction is stop, back up, turn.',
+   expId:'12 < 20, jadi rintangan terlalu dekat — reaksi aman adalah berhenti, mundur, berbelok.'}
+];
+
+/* ============================================================
+   LAB (slider simulator) RENDERERS — bespoke per lab
+============================================================ */
+function rLabPot(){
   return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 1 · Close the loop</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Make the bulb light up</h2>
-    <div class="title-id id">Buat lampunya menyala</div>
-    <p class="lead">Electricity needs a complete loop. Flip the switch and watch the current flow.
-      <span class="id">/ Listrik butuh lingkaran lengkap. Tekan saklar dan lihat arus mengalir.</span></p>
-    <div class="split" style="margin-top:18px">
+    <div class="task-tag build">${I.hammer} Lab 1 · Build it</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Turn the potentiometer, read the number</h2>
+    <div class="title-id id">Putar potensiometer, baca angkanya</div>
+    <p class="lead">A potentiometer is a knob-shaped voltage divider. Turn the dial and watch analogRead(A0) change live.
+      <span class="id">/ Potensiometer adalah pembagi tegangan berbentuk kenop. Putar kenopnya dan lihat analogRead(A0) berubah langsung.</span></p>
+    <div class="split" style="margin-top:16px">
       <div class="gstage">
-        <svg viewBox="0 0 340 215" width="100%" style="max-width:400px;margin:0 auto">
-          <rect x="40" y="118" width="70" height="58" rx="8" fill="#101d3a"/>
-          <text x="75" y="152" fill="#84ddd3" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">BATT</text>
-          <path d="M75 118 V50 H250 V80" fill="none" stroke="#1a2540" stroke-width="5"/>
-          <circle id="gBulb" cx="250" cy="110" r="30" fill="#cfd6e0" stroke="#aab4c2" stroke-width="4" style="transition:fill .3s,stroke .3s"/>
-          <path id="gFil" d="M236 110h28M250 96v28" stroke="#aab4c2" stroke-width="3.5" stroke-linecap="round"/>
-          <path d="M250 140 V178 H112" fill="none" stroke="#1a2540" stroke-width="5"/>
-          <circle cx="110" cy="178" r="5" fill="#1a2540"/>
-          <line id="gArm" x1="110" y1="178" x2="84" y2="156" stroke="#c95555" stroke-width="5" stroke-linecap="round"/>
-          <circle cx="75" cy="178" r="5" fill="#1a2540"/>
-          <path id="gFlow" class="flowpath" d="M75 118 V50 H250 V80 M250 140 V178 H112 M108 178 H77"/>
-        </svg>
-        <div><span class="status-tag off" id="gStatus">Circuit OPEN · Terbuka</span></div>
-        <button class="btn btn-teal" style="margin-top:12px" onclick="toggleCircuit()">${I.toggle}<span>Flip the switch · Tekan saklar</span></button>
-        <div class="hint" id="gHint">Close the loop to earn 100 points · Tutup rangkaian untuk 100 poin</div>
+        <div class="dial"><div class="needle2" id="potNeedle"></div></div>
+        <input type="range" min="0" max="1023" step="1" value="512" id="potSlider" oninput="potUpdate()" style="width:80%">
+        <div class="bigread" style="margin-top:10px"><span id="potVal">512</span> <small>analogRead(A0)</small></div>
+        <div class="rowval" id="potVolt">2.50 V</div>
       </div>
       <div>${pointsList([
-        ['Battery pushes the electricity','Baterai mendorong listrik'],
-        ['Wires carry it around the loop','Kabel membawanya berputar'],
-        ['The switch opens or closes the path','Saklar membuka atau menutup jalur'],
-        ['Closed loop = current flows = light','Tertutup = arus mengalir = menyala']])}</div>
+        ['Turn fully one way → reads close to 0','Putar penuh ke satu arah → membaca mendekati 0'],
+        ['Turn fully the other way → reads close to 1023','Putar penuh arah lain → membaca mendekati 1023'],
+        ['Middle position → close to 512, about 2.5 V','Posisi tengah → mendekati 512, sekitar 2,5 V']])}
+        <button class="btn btn-teal" style="margin-top:10px" onclick="potCheck()">${I.check}<span>Check the middle · Periksa tengah</span></button>
+        ${FBOX('potFb')}
+      </div>
     </div>
   </div></section>`;
 }
-
-/* ---- GAME: Ohm lab ---- */
-function rGameOhm(){
+function rLabNight(){
   return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 2 · Ohm's lab</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Tune the current for the LED</h2>
-    <div class="title-id id">Atur arus untuk LED</div>
-    <p class="lead">Use the sliders. Get the current I into the green safe zone: 15–25 mA.
-      <span class="id">/ Gunakan slider. Masukkan arus I ke zona hijau aman: 15–25 mA.</span></p>
+    <div class="task-tag build">${I.hammer} Lab 2 · Build it</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Set the night-light threshold</h2>
+    <div class="title-id id">Atur ambang batas lampu malam</div>
+    <p class="lead">Drag "room light" to simulate day turning to night. Find the threshold where the LED should switch on.
+      <span class="id">/ Geser "cahaya ruangan" untuk mensimulasikan siang berubah malam. Temukan ambang batas LED harus menyala.</span></p>
     <div class="split" style="margin-top:16px">
       <div class="gstage">
-        <div class="formula" style="margin-top:0">I = V ÷ R</div>
-        <div class="bigread" style="margin-top:14px"><span id="ohmI">50.0</span> <small>mA</small></div>
-        <div class="zone"><div class="safe" id="ohmSafe"></div><div class="needle" id="ohmNeedle"></div></div>
-        <div class="zlbl"><span>0 mA</span><span>safe 15–25</span><span>60 mA</span></div>
-        <div><span class="status-tag mid" id="ohmStatus">Too much — the LED would burn! · Terlalu besar!</span></div>
+        <div class="slider-row" style="justify-content:center"><span style="font-size:13px;color:var(--muted)">room light</span>
+          <input type="range" min="0" max="1023" step="1" value="700" id="nightSlider" oninput="nightUpdate()">
+          <span class="rowval" id="nightVal">700</span></div>
+        <div class="simled" id="nightLed"></div>
+        <div><span class="status-tag off" id="nightStatus">LED off · Siang hari</span></div>
       </div>
       <div class="gstage" style="text-align:left">
-        <div class="slider-row" style="justify-content:flex-start"><span style="font-size:13px;color:var(--muted);min-width:88px">Voltage V</span>
-          <input type="range" min="1" max="12" step="0.5" value="5" id="ohmV" oninput="ohmUpdate()">
-          <span class="delayval" id="ohmVv">5.0 V</span></div>
-        <div class="slider-row" style="justify-content:flex-start"><span style="font-size:13px;color:var(--muted);min-width:88px">Resistance R</span>
-          <input type="range" min="100" max="1000" step="10" value="100" id="ohmR" oninput="ohmUpdate()">
-          <span class="delayval" id="ohmRv">100 Ω</span></div>
-        <div class="hint">Tip: bigger R calms the current down. · Tips: R lebih besar menenangkan arus.</div>
-        ${FBOX('ohmFb')}
+        <div class="code"><div class="fname">nightlight.ino</div>
+<pre><span class="kw">if</span> (lightLevel < <span class="num">300</span>) {
+  digitalWrite(ledPin, HIGH);
+} <span class="kw">else</span> {
+  digitalWrite(ledPin, LOW);
+}</pre></div>
+        <div class="hint">Slide below 300 to see the code "fire" · Geser di bawah 300 untuk melihat kode "aktif"</div>
+        ${FBOX('nightFb')}
       </div>
     </div>
   </div></section>`;
 }
-
-/* ---- GAME: polarity ---- */
-function polSvg(correct,lit){
-  const ledFill=lit?'#e3a23b':'#c95555', ledStroke=lit?'#b97f1f':'#96322f';
-  const glow=lit?'<circle cx="196" cy="60" r="30" fill="#e3a23b" opacity=".25"/>':'';
-  return `<svg viewBox="0 0 260 130" width="100%" style="max-width:250px;margin:0 auto">
-    ${glow}
-    <rect x="10" y="42" width="58" height="46" rx="7" fill="#0f6e68"/>
-    <text x="39" y="70" fill="#d3f2ee" font-size="10" font-weight="700" text-anchor="middle" font-family="'Space Grotesk'">PIN 13</text>
-    <line x1="68" y1="60" x2="96" y2="60" stroke="#c95555" stroke-width="4"/>
-    <rect x="96" y="50" width="44" height="20" rx="4" fill="#d9a066" stroke="#8a5a2b" stroke-width="1.6"/>
-    <line x1="140" y1="60" x2="176" y2="60" stroke="#c95555" stroke-width="4"/>
-    <circle cx="196" cy="60" r="20" fill="${ledFill}" stroke="${ledStroke}" stroke-width="3"/>
-    <text x="${correct?178:206}" y="46" fill="#1a2540" font-size="15" font-weight="800" font-family="sans-serif">+</text>
-    <text x="${correct?206:178}" y="46" fill="#1a2540" font-size="15" font-weight="800" font-family="sans-serif">–</text>
-    <line x1="196" y1="80" x2="196" y2="104" stroke="#1a2540" stroke-width="4"/>
-    <line x1="196" y1="104" x2="39" y2="104" stroke="#1a2540" stroke-width="4"/>
-    <line x1="39" y1="104" x2="39" y2="88" stroke="#1a2540" stroke-width="4"/>
-    <text x="52" y="120" fill="#5f6b83" font-size="10" font-family="monospace">GND</text>
-  </svg>`;
-}
-function rGamePolarity(){
-  g.polCorrectIdx=Math.random()<0.5?0:1;
-  const cards=[0,1].map(i=>`<div class="pol-card" id="pol${i}" onclick="polPick(${i})">
-      ${polSvg(i===g.polCorrectIdx,false)}
-      <div class="pname">Circuit ${i===0?'A':'B'}</div>
-      <div class="pid id">Rangkaian ${i===0?'A':'B'}</div></div>`).join('');
+function rLabDist(){
   return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 3 · LED direction</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Which circuit will light up?</h2>
-    <div class="title-id id">Rangkaian mana yang akan menyala?</div>
-    <p class="lead">Current must enter the LED through its plus (+) leg. Look at the labels.
-      <span class="id">/ Arus harus masuk LED lewat kaki plus (+). Perhatikan labelnya.</span></p>
-    <div class="pol-grid">${cards}</div>
-    ${FBOX('polFb')}
-  </div></section>`;
-}
-
-/* ---- GAME: component ID with real photos ---- */
-function rGameID(){
-  const items=shuffle([
-    {k:'resistors',fb:'resistor',lbl:'?',ok:1},
-    {k:'leds',fb:'led',lbl:'?'},
-    {k:'chip',fb:'chip',lbl:'?'},
-  ]);
-  g.idItems=items;
-  return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 4 · Spot the part</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Tap the RESISTORS</h2>
-    <div class="title-id id">Ketuk RESISTOR</div>
-    <p class="lead">Real photos, real parts. Find the component with the colored stripes.
-      <span class="id">/ Foto asli, komponen asli. Temukan komponen dengan garis warna.</span></p>
-    <div class="idgrid">
-      ${items.map((it,i)=>`<div class="idcard" id="idc${i}" onclick="idPick(${i})">
-        <div class="ph-wrap"><img src="${PH[it.k].u}" alt="component" loading="lazy" referrerpolicy="no-referrer" onload="phLoad(this)" onerror="phFail(this)"><div class="ph-fb">${FB[it.fb]}</div></div>
-        <div class="lbl">Part ${String.fromCharCode(65+i)}</div></div>`).join('')}
-    </div>
-    ${FBOX('idFb')}
-  </div></section>`;
-}
-
-/* ---- GAME: PWM dimmer ---- */
-function rGamePWM(){
-  g.pwmTarget=60+Math.floor(Math.random()*170);
-  return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 5 · PWM dimmer</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Hit the target brightness</h2>
-    <div class="title-id id">Capai kecerahan target</div>
-    <p class="lead">PWM writes a value from 0 to 255. Set the slider to <b>${g.pwmTarget}</b> (±12 is fine), then press Check.
-      <span class="id">/ PWM menulis nilai 0–255. Atur slider ke <b>${g.pwmTarget}</b> (±12 boleh), lalu tekan Periksa.</span></p>
+    <div class="task-tag build">${I.hammer} Lab 3 · Build it</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Turn echo time into distance</h2>
+    <div class="title-id id">Ubah waktu gema jadi jarak</div>
+    <p class="lead">Slide the echo time (microseconds) and watch the distance formula compute the answer live.
+      <span class="id">/ Geser waktu gema (mikrodetik) dan lihat rumus jarak menghitung jawabannya langsung.</span></p>
     <div class="split" style="margin-top:16px">
       <div class="gstage">
-        <div style="font-family:'Space Grotesk';font-weight:700;color:var(--ink-soft);font-size:14px">analogWrite(9, <span id="pwmValTxt" class="mono" style="color:var(--teal-d)">128</span>)</div>
-        <div class="simled" id="pwmLed" style="background:#e3a23b;border-color:#b97f1f;opacity:.5"></div>
-        <svg viewBox="0 0 260 60" width="100%" style="max-width:280px;margin:6px auto 0">
-          <path id="pwmWave" d="" fill="none" stroke="#178f87" stroke-width="3" stroke-linejoin="round"/>
-          <text x="130" y="57" text-anchor="middle" font-size="10.5" fill="#5f6b83" font-family="sans-serif">duty cycle · siklus kerja: <tspan id="pwmDuty" font-weight="700">50%</tspan></text>
-        </svg>
+        <div class="formula">distance = time × 0.034 ÷ 2</div>
+        <div class="slider-row" style="justify-content:center"><span style="font-size:13px;color:var(--muted)">echo time (µs)</span>
+          <input type="range" min="60" max="3000" step="10" value="1000" id="distSlider" oninput="distUpdate()">
+          <span class="rowval" id="distTime">1000 µs</span></div>
+        <div class="bigread" style="margin-top:8px"><span id="distVal">17.0</span> <small>cm</small></div>
+        <div><span class="status-tag on" id="distStatus">Clear path · Jalur aman</span></div>
+      </div>
+      <div>${pointsList([
+        ['Sound travels 0.034 cm per microsecond','Suara menempuh 0,034 cm per mikrodetik'],
+        ['Divide by 2 because the sound goes there AND back','Bagi 2 karena suara pergi DAN kembali'],
+        ['Try to land the distance under 20 cm','Coba buat jaraknya di bawah 20 cm']])}
+        ${FBOX('distFb')}
+      </div>
+    </div>
+  </div></section>`;
+}
+function rLabServo(){
+  return `<section class="slide"><div class="card">
+    <div class="task-tag build">${I.hammer} Lab 4 · Build it</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Aim the servo at the target angle</h2>
+    <div class="title-id id">Arahkan servo ke sudut target</div>
+    <p class="lead">Set myServo.write(angle) using the slider. Land within 8° of the target to earn points.
+      <span class="id">/ Atur myServo.write(sudut) memakai slider. Capai dalam 8° dari target untuk mendapat poin.</span></p>
+    <div class="split" style="margin-top:16px">
+      <div class="gstage">
+        <div class="servo-base"><div class="servo-arm" id="servoArm"></div></div>
+        <div style="font-family:'JetBrains Mono';font-size:13px;color:var(--ink-soft);margin-top:8px">myServo.write(<span id="servoValTxt">90</span>)</div>
+        <input type="range" min="0" max="180" step="1" value="90" id="servoSlider" oninput="servoUpdate()" style="width:80%">
+        <div class="hint" id="servoTargetHint"></div>
       </div>
       <div class="gstage" style="text-align:left">
-        <div class="slider-row" style="justify-content:flex-start">
-          <span style="font-size:13px;color:var(--muted)">value</span>
-          <input type="range" min="0" max="255" step="1" value="128" id="pwmSlider" oninput="pwmUpdate()">
-          <span class="delayval" id="pwmVv">128</span></div>
-        <button class="btn btn-teal" style="margin-top:8px" onclick="pwmCheck()">${I.check}<span>Check · Periksa</span></button>
-        <div class="hint">The LED is only ON part of each cycle — your eyes average it into brightness.<br><span class="id">LED hanya nyala sebagian siklus — matamu merata-ratakannya jadi kecerahan.</span></div>
-        ${FBOX('pwmFb')}
+        <button class="btn btn-teal" onclick="servoCheck()">${I.check}<span>Check · Periksa</span></button>
+        <div class="hint">0° = full left, 90° = center, 180° = full right.<br><span class="id">0° = penuh kiri, 90° = tengah, 180° = penuh kanan.</span></div>
+        ${FBOX('servoFb')}
       </div>
     </div>
   </div></section>`;
 }
-
-/* ---- GAME: pin match ---- */
-function rGameMatch(){
-  const pairs=[
-    {pin:'5V',en:'Gives out 5 volts of power',id:'Memberi daya 5 volt'},
-    {pin:'GND',en:'Where the loop returns',id:'Tempat rangkaian kembali'},
-    {pin:'A0',en:'Reads sensor values 0–1023',id:'Membaca nilai sensor 0–1023'},
-    {pin:'~9',en:'Dims an LED with PWM',id:'Meredupkan LED dengan PWM'},
-  ];
-  g.matchSel=null;g.matchDone=0;
-  const left=shuffle(pairs.map((p,i)=>({i,label:p.pin})));
-  const right=shuffle(pairs.map((p,i)=>({i,en:p.en,id:p.id})));
+function rLabColor(){
   return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 6 · Pin match</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Match each pin to its job</h2>
-    <div class="title-id id">Cocokkan tiap pin dengan tugasnya</div>
-    <p class="lead">Tap a pin, then tap its matching job. +25 per correct pair.
-      <span class="id">/ Ketuk pin, lalu ketuk tugas yang cocok. +25 per pasangan benar.</span></p>
-    <div class="match-wrap">
-      <div class="mcol">${left.map(o=>`<button class="mitem" data-i="${o.i}" data-side="pin" onclick="matchPick(this,'m')"><span class="mono">${o.label}</span></button>`).join('')}</div>
-      <div class="mcol">${right.map(o=>`<button class="mitem" data-i="${o.i}" data-side="job" onclick="matchPick(this,'m')">${o.en}<span class="id">${o.id}</span></button>`).join('')}</div>
-    </div>
-    <div class="hint" id="mHint">0 / 4 matched · tercocokkan</div>
-  </div></section>`;
-}
-
-/* ---- GAME: binary ---- */
-function rGameBinary(){
-  g.binTarget=3+Math.floor(Math.random()*12); // 3..14
-  g.bits=[0,0,0,0];
-  return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 7 · Binary builder</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Build the number <span style="color:var(--teal-d)">${g.binTarget}</span> in binary</h2>
-    <div class="title-id id">Susun angka ${g.binTarget} dalam biner</div>
-    <p class="lead">Tap the bits ON (1) or OFF (0). Their values add up: 8 + 4 + 2 + 1.
-      <span class="id">/ Ketuk bit NYALA (1) atau MATI (0). Nilainya dijumlahkan: 8 + 4 + 2 + 1.</span></p>
-    <div class="gstage" style="margin-top:16px">
-      <div class="bits">
-        ${[8,4,2,1].map((v,i)=>`<button class="bit" id="bit${i}" onclick="bitFlip(${i})"><div class="bv">value ${v}</div><div class="bd">0</div></button>`).join('')}
-      </div>
-      <div class="bigread" style="margin-top:16px"><span id="binSum">0</span> <small>your number · angkamu</small></div>
-      <button class="btn btn-teal" style="margin-top:12px" onclick="binCheck()">${I.check}<span>Check · Periksa</span></button>
-      ${FBOX('binFb')}
-    </div>
-  </div></section>`;
-}
-
-/* ---- blink intro (theory) ---- */
-function rBlinkIntro(){
-  return `<section class="slide"><div class="card"><div class="split">
-    <div>
-      <div class="headicon navy">${I.code}</div>
-      <div class="eyebrow"><span class="dot"></span>Lesson 9B · Koding</div>
-      <h2 class="title">Anatomy of a program</h2><div class="title-id id">Anatomi sebuah program</div>
-      <p class="lead">Every Arduino program (a "sketch") has exactly two rooms. That is the whole secret.
-        <span class="id">/ Setiap program Arduino ("sketch") punya tepat dua ruang. Itulah seluruh rahasianya.</span></p>
-      ${pointsList([
-        ['setup() — runs once when power comes on','setup() — berjalan sekali saat daya menyala'],
-        ['loop() — repeats forever, millions of times','loop() — berulang selamanya, jutaan kali'],
-        ['Lines end with a semicolon ;','Baris diakhiri titik koma ;'],
-        ['// starts a comment — a note for humans','// memulai komentar — catatan untuk manusia']])}
-    </div>
-    <div class="code">
-      <div class="fname">blink.ino — the "Hello World" of hardware</div>
-<pre><span class="kw">void</span> <span class="fn">setup</span>() {
-  <span class="fn">pinMode</span>(<span class="num">13</span>, <span class="con">OUTPUT</span>);
-}
-
-<span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="fn">digitalWrite</span>(<span class="num">13</span>, <span class="con">HIGH</span>); <span class="cm">// ON</span>
-  <span class="fn">delay</span>(<span class="num">1000</span>);
-  <span class="fn">digitalWrite</span>(<span class="num">13</span>, <span class="con">LOW</span>);  <span class="cm">// OFF</span>
-  <span class="fn">delay</span>(<span class="num">1000</span>);
-}</pre>
-    </div>
-  </div></div></section>`;
-}
-
-/* ---- GAME: blink simulator ---- */
-function rGameBlink(){
-  return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 8 · Blink simulator</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Upload it — then hack the speed</h2>
-    <div class="title-id id">Unggah — lalu ubah kecepatannya</div>
-    <p class="lead">Press Upload and the virtual LED obeys the code. Move the slider — you are editing delay() live.
-      <span class="id">/ Tekan Upload dan LED virtual menuruti kodenya. Geser slider — kamu mengedit delay() langsung.</span></p>
-    <div class="sim" style="margin-top:16px">
-      <div class="code">
-        <div class="fname">blink.ino</div>
-<pre><span class="kw">void</span> <span class="fn">loop</span>() {
-  <span class="fn">digitalWrite</span>(<span class="num">13</span>, <span class="con">HIGH</span>);
-  <span class="fn">delay</span>(<span class="num" id="cD1">1000</span>);
-  <span class="fn">digitalWrite</span>(<span class="num">13</span>, <span class="con">LOW</span>);
-  <span class="fn">delay</span>(<span class="num" id="cD2">1000</span>);
-}</pre>
-      </div>
+    <div class="task-tag build">${I.hammer} Lab 5 · Build it</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Mix a target color with PWM</h2>
+    <div class="title-id id">Campur warna target dengan PWM</div>
+    <p class="lead">Move the R, G, B sliders (each 0–255) until the swatch turns a warm orange.
+      <span class="id">/ Geser slider R, G, B (masing-masing 0–255) sampai warnanya jadi oranye hangat.</span></p>
+    <div class="split" style="margin-top:16px">
       <div class="gstage">
-        <div style="font-family:'Space Grotesk';font-weight:700;color:var(--ink-soft);font-size:14px">PIN 13 LED</div>
-        <div class="simled" id="simLed"></div>
-        <button class="btn btn-primary" onclick="uploadBlink()" id="uplBtn">${I.play}<span>Upload · Unggah</span></button>
-        <div class="slider-row">
-          <span style="font-size:13px;color:var(--muted)">delay:</span>
-          <input type="range" min="150" max="1500" step="50" value="1000" id="delaySlider" oninput="setDelay(this.value)">
-          <span class="delayval" id="delayVal">1000 ms</span>
-        </div>
-        <div class="hint">Small delay = fast blink. Try 150 ms.<br><span class="id">Delay kecil = kedip cepat. Coba 150 ms.</span></div>
+        <div class="colorsw" id="colorSw" style="background:rgb(128,64,0)"></div>
+        <div class="hint" id="colorHint">Target: a warm orange · Target: oranye hangat</div>
+      </div>
+      <div class="gstage" style="text-align:left">
+        <div class="slider-row"><span style="min-width:26px;color:#c95555;font-weight:700">R</span><input type="range" min="0" max="255" value="128" id="colR" oninput="colorUpdate()"><span class="rowval" id="colRv">128</span></div>
+        <div class="slider-row"><span style="min-width:26px;color:#2c8f63;font-weight:700">G</span><input type="range" min="0" max="255" value="64" id="colG" oninput="colorUpdate()"><span class="rowval" id="colGv">64</span></div>
+        <div class="slider-row"><span style="min-width:26px;color:#1a5fb4;font-weight:700">B</span><input type="range" min="0" max="255" value="0" id="colB" oninput="colorUpdate()"><span class="rowval" id="colBv">0</span></div>
+        <button class="btn btn-teal" style="margin-top:6px" onclick="colorCheck()">${I.check}<span>Check · Periksa</span></button>
+        ${FBOX('colorFb')}
       </div>
     </div>
   </div></section>`;
 }
 
-/* ---- code vocab ---- */
-function rCodeVocab(){
-  const rows=[
-    ['pinMode(pin, mode)','Declares a pin as INPUT or OUTPUT','Menetapkan pin sebagai INPUT atau OUTPUT'],
-    ['digitalWrite(pin, v)','Sets a pin HIGH (on) or LOW (off)','Membuat pin HIGH (nyala) atau LOW (mati)'],
-    ['digitalRead(pin)','Reads HIGH or LOW from a pin','Membaca HIGH atau LOW dari pin'],
-    ['analogRead(A0)','Reads a sensor value 0–1023','Membaca nilai sensor 0–1023'],
-    ['analogWrite(pin, 0–255)','PWM output — dim, fade, speed','Output PWM — redup, pudar, kecepatan'],
-  ];
+/* ============================================================
+   RENDERERS — generic task types
+============================================================ */
+function rOrder(o){
+  const chips = shuffle(o.steps.map((s,i)=>({s,i})));
   return `<section class="slide"><div class="card">
-    <div class="headicon navy">${I.code}</div>
-    <div class="eyebrow"><span class="dot"></span>Lesson 9C · Kamus koding</div>
-    <h2 class="title">Five commands = 100 projects</h2><div class="title-id id">Lima perintah = 100 proyek</div>
-    <p class="lead">This tiny vocabulary is enough to build alarms, night-lights, robots and games.
-      <span class="id">/ Kosakata kecil ini cukup untuk membuat alarm, lampu malam, robot dan gim.</span></p>
-    <ul class="points">${rows.map(r=>`<li><span class="tick">${I.tick}</span><span><b class="mono" style="font-size:14px">${r[0]}</b><span style="display:block;font-size:14px;margin-top:2px">${r[1]}</span><span class="id">${r[2]}</span></span></li>`).join('')}</ul>
-  </div></section>`;
-}
-
-/* ---- GAME: find the bug ---- */
-function rGameBug(){
-  const lines=[
-    {t:'pinMode(13, OUTPUT);',ok:0},
-    {t:'digitalWrite(13, HGIH);',ok:1},
-    {t:'delay(1000);',ok:0},
-    {t:'digitalWrite(13, LOW);',ok:0},
-  ];
-  g.bugLines=lines;
-  return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 9 · Bug hunt</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">One line is broken — find it</h2>
-    <div class="title-id id">Satu baris rusak — temukan</div>
-    <p class="lead">Computers need exact words. One tiny typo and nothing works. Tap the broken line.
-      <span class="id">/ Komputer butuh kata yang persis. Satu salah ketik kecil dan semuanya gagal. Ketuk baris yang rusak.</span></p>
-    <div class="buglines">
-      ${lines.map((l,i)=>`<button class="bugline" id="bug${i}" onclick="bugPick(${i})">${i+1}&nbsp;&nbsp;${l.t.replace('<','&lt;')}</button>`).join('')}
+    <div class="task-tag">${I.game} ${o.tag}</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">${o.tagEn}</h2>
+    <div class="title-id id">${o.tagId}</div>
+    <p class="lead">${o.leadEn} <span class="id">/ ${o.leadId}</span></p>
+    <div class="chips" id="chips-${o.id}">
+      ${chips.map(c=>`<button class="chip" data-i="${c.i}" onclick="orderPick('${o.id}',this)">${c.s}</button>`).join('')}
     </div>
-    ${FBOX('bugFb')}
+    <div class="seq" id="seq-${o.id}"><span class="placeholder">Your sequence appears here · Urutanmu muncul di sini</span></div>
+    ${FBOX('fb-'+o.id)}
   </div></section>`;
 }
-
-/* ---- GAME: wiring order ---- */
-function rGameOrder(){
-  g.orderSteps=['Pin 13','Resistor','LED +','LED –','GND'];
-  g.orderPos=0;g.orderMistakes=0;
-  const chips=shuffle(g.orderSteps.map((s,i)=>({s,i})));
+function rFill(f){
+  const opts = shuffle(f.opts);
   return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 10 · Wire it up</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Tap the wiring steps in order</h2>
-    <div class="title-id id">Ketuk langkah perakitan sesuai urutan</div>
-    <p class="lead">Build the loop that makes the LED blink: start from the pin, end at ground.
-      <span class="id">/ Rakit lingkaran yang membuat LED berkedip: mulai dari pin, akhiri di ground.</span></p>
-    <div class="chips" id="orderChips">
-      ${chips.map(c=>`<button class="chip" data-i="${c.i}" onclick="orderPick(this)">${c.s}</button>`).join('')}
+    <div class="task-tag">${I.hammer} ${f.tag}</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">${f.tagEn}</h2>
+    <div class="title-id id">${f.tagId}</div>
+    <p class="lead">${f.leadEn} <span class="id">/ ${f.leadId}</span></p>
+    <div class="code" style="margin-top:14px"><div class="fname">sketch.ino</div>
+    <pre>${f.pre}<span class="blank" id="blank-${f.id}">?  ?  ?</span>${f.post}</pre></div>
+    <div class="fillopts" id="opts-${f.id}">
+      ${opts.map(o=>`<button class="fillopt" onclick="fillPick('${f.id}',this,${o.ok?1:0},'${o.t.replace(/'/g,"\\'")}')">${o.t}</button>`).join('')}
     </div>
-    <div class="seq" id="orderSeq"><span class="placeholder">Your wiring appears here · Rangkaianmu muncul di sini</span></div>
-    ${FBOX('orderFb')}
+    ${FBOX('fb-'+f.id)}
   </div></section>`;
 }
-
-/* ---- GAME: sensor match ---- */
-function rGameSensor(){
-  const pairs=[
-    {a:'Ultrasonic sensor',ai:'Sensor ultrasonik',b:'Measures distance with echo',bi:'Mengukur jarak dengan gema'},
-    {a:'Light sensor (LDR)',ai:'Sensor cahaya (LDR)',b:'Feels how bright it is',bi:'Merasakan seberapa terang'},
-    {a:'Push button',ai:'Tombol tekan',b:'Feels a finger press',bi:'Merasakan tekanan jari'},
-  ];
-  g.senSel=null;g.senDone=0;
-  const left=shuffle(pairs.map((p,i)=>({i,en:p.a,id:p.ai})));
-  const right=shuffle(pairs.map((p,i)=>({i,en:p.b,id:p.bi})));
+function rMatch(m){
+  const left = shuffle(m.pairs.map((p,i)=>({i,en:p.en,id_:p.id_})));
+  const right = shuffle(m.pairs.map((p,i)=>({i,en:p.en2,id_:p.id2})));
   return `<section class="slide"><div class="card">
-    <div class="game-tag">${I.game} Game 11 · Robot senses</div>
-    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Match sensor to its superpower</h2>
-    <div class="title-id id">Cocokkan sensor dengan kekuatannya</div>
-    <p class="lead">Tap a sensor, then tap what it can feel. +30 per pair, +10 for finishing.
-      <span class="id">/ Ketuk sensor, lalu ketuk apa yang bisa dirasakannya. +30 per pasangan, +10 saat selesai.</span></p>
+    <div class="task-tag">${I.game} Task · Match the pairs</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">Match each sensor to its superpower</h2>
+    <div class="title-id id">Cocokkan tiap sensor dengan kekuatannya</div>
+    <p class="lead">Tap a sensor, then tap what it feels. +${m.per} points per correct pair.
+      <span class="id">/ Ketuk sensor, lalu ketuk apa yang dirasakannya. +${m.per} poin per pasangan benar.</span></p>
     <div class="match-wrap">
-      <div class="mcol">${left.map(o=>`<button class="mitem" data-i="${o.i}" data-side="pin" onclick="matchPick(this,'s')">${o.en}<span class="id">${o.id}</span></button>`).join('')}</div>
-      <div class="mcol">${right.map(o=>`<button class="mitem" data-i="${o.i}" data-side="job" onclick="matchPick(this,'s')">${o.en}<span class="id">${o.id}</span></button>`).join('')}</div>
+      <div class="mcol">${left.map(o=>`<button class="mitem" data-i="${o.i}" data-side="a" onclick="matchPick('${m.id}',this)">${o.en}<span class="id">${o.id_}</span></button>`).join('')}</div>
+      <div class="mcol">${right.map(o=>`<button class="mitem" data-i="${o.i}" data-side="b" onclick="matchPick('${m.id}',this)">${o.en}<span class="id">${o.id_}</span></button>`).join('')}</div>
     </div>
-    <div class="hint" id="sHint">0 / 3 matched · tercocokkan</div>
+    <div class="hint" id="hint-${m.id}">0 / ${m.total} matched · tercocokkan</div>
   </div></section>`;
 }
-
-/* ---- projects gallery (real photos) ---- */
-function rProjects(){
+function rPredict(p){
   return `<section class="slide"><div class="card">
-    <div class="headicon amber">${I.rocket}</div>
-    <div class="eyebrow"><span class="dot"></span>Lesson 11 · Dunia nyata</div>
-    <h2 class="title">Real projects, real photos</h2><div class="title-id id">Proyek nyata, foto nyata</div>
-    <p class="lead">Everything you learned today is exactly what powers these builds.
-      <span class="id">/ Semua yang kamu pelajari hari ini persis yang menggerakkan karya-karya ini.</span></p>
-    <div class="gallery">
-      ${photo('robot','robot','Robot buggy — motors + sensors + code','Robot buggy — motor + sensor + kode')}
-      ${photo('breadled','bread','LED circuits on a breadboard','Rangkaian LED di breadboard')}
-      ${photo('mounted','board','Arduino + breadboard project','Proyek Arduino + breadboard')}
+    <div class="task-tag">${I.eye} ${p.tag}</div>
+    <h2 class="title" style="font-size:clamp(22px,3.6vw,32px)">${p.tagEn}</h2>
+    <div class="title-id id">${p.tagId}</div>
+    <p class="lead">${p.leadEn} <span class="id">/ ${p.leadId}</span></p>
+    <div class="chips" style="flex-direction:column;align-items:stretch" id="lines-${p.id}">
+      ${p.lines.map((l,i)=>`<button class="chip" style="text-align:left;font-family:'JetBrains Mono'" data-i="${i}" onclick="predictPick('${p.id}',${i},${l.ok?1:0})">${l.t}</button>`).join('')}
     </div>
+    ${FBOX('fb-'+p.id)}
   </div></section>`;
 }
-
-/* ---- roadmap ---- */
-function rRoadmap(){
-  return `<section class="slide"><div class="card">
-    <div class="headicon">${I.flag}</div>
-    <div class="eyebrow"><span class="dot"></span>Lesson 12 · Peta jalan</div>
-    <h2 class="title">Your maker roadmap</h2><div class="title-id id">Peta jalan maker-mu</div>
-    <p class="lead">Today was step one. Here is where this path leads next.
-      <span class="id">/ Hari ini adalah langkah pertama. Inilah kelanjutan jalurnya.</span></p>
-    ${pointsList([
-      ['Week 1 — Blink, traffic light, button + LED','Minggu 1 — Blink, lampu lalu lintas, tombol + LED'],
-      ['Week 2 — Sensors: night-light, distance alarm','Minggu 2 — Sensor: lampu malam, alarm jarak'],
-      ['Week 3 — Motors and servo movement','Minggu 3 — Motor dan gerakan servo'],
-      ['Week 4 — Your own robot that avoids walls','Minggu 4 — Robotmu sendiri yang menghindari dinding']])}
-    <div class="pro"><span class="pb">PRO FACT</span><span>Every command you used today — digitalWrite, delay, analogRead — is used unchanged in those robots.<span class="id">Setiap perintah hari ini — digitalWrite, delay, analogRead — dipakai tanpa berubah di robot-robot itu.</span></span></div>
-  </div></section>`;
-}
-
-function rQuiz(s,idx){
+function rQuiz(idx){
+  const s = QUIZ[idx-QUIZ_OFFSET];
+  const opts = shuffle(s.opts.map((o,i)=>({...o,orig:i})));
   return `<section class="slide"><div class="card quiz">
-    <div class="qnum">${s.label} · Kuis</div>
-    <h2>${s.data.q.en}</h2><div class="q-id id">${s.data.q.id}</div>
+    <div class="qnum">Checkpoint · Kuis</div>
+    <h2>${s.q.en}</h2><div class="q-id id">${s.q.id}</div>
     <div class="opts">
-      ${s.data.opts.map((o,i)=>`<button class="opt" onclick="answer(${idx},this)" data-ok="${o.ok?1:0}">
+      ${opts.map((o,i)=>`<button class="opt" onclick="answer(${idx},this)" data-ok="${o.ok?1:0}">
         <span class="key">${String.fromCharCode(65+i)}</span>
         <span class="otext">${o.en}<span class="id">${o.id}</span></span></button>`).join('')}
     </div>
-    <div class="feedback" id="fb${idx}"><span class="fi"></span><span><b class="ft"></b><span class="id fx">${s.data.exp.id}</span></span></div>
+    <div class="feedback" id="fb${idx}"><span class="fi"></span><span><b class="ft"></b><span class="id fx">${s.exp.id}</span></span></div>
   </div></section>`;
 }
-
+function rGallery(){
+  return `<section class="slide"><div class="card">
+    <div class="headicon amber">${I.rocket}</div>
+    <div class="eyebrow"><span class="dot"></span>Lesson 35 · Dunia nyata</div>
+    <h2 class="title">Real builds, real photos</h2><div class="title-id id">Karya nyata, foto nyata</div>
+    <p class="lead">Everything from sensors to servos to robot logic — this is exactly what runs inside these builds.
+      <span class="id">/ Semua dari sensor sampai servo sampai logika robot — inilah persis yang berjalan di dalam karya-karya ini.</span></p>
+    <div class="gallery">
+      ${photo('robot',FB.robot,'A robot buggy — sensors, motors, code together','Robot buggy — sensor, motor, kode bersama')}
+      ${photo('robot2',FB.robot,'The official Arduino Robot','Arduino Robot resmi')}
+      ${photo('mounted',FB.sensor,'Arduino + breadboard, ready to build','Arduino + breadboard, siap dirakit')}
+    </div>
+  </div></section>`;
+}
 function rResults(){
   return `<section class="slide"><div class="dark-panel results">
     <div class="blob b1"></div><div class="blob b2"></div>
-    <div class="eyebrow" style="justify-content:center"><span class="dot"></span>Lesson complete · Selesai</div>
-    <h2>Great work! · Kerja bagus!</h2>
+    <div class="eyebrow" style="justify-content:center"><span class="dot"></span>Part 2 complete · Selesai</div>
+    <h2>You are a real maker now! · Kamu maker sungguhan sekarang!</h2>
     <div class="ring-wrap"><div class="ring">
       <svg width="190" height="190">
-        <circle cx="95" cy="95" r="82" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="15"/>
-        <circle id="ringArc" class="rc" cx="95" cy="95" r="82" fill="none" stroke="#e3a23b" stroke-width="15" stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515"/>
+        <circle cx="95" cy="95" r="82" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="15"/>
+        <circle id="ringArc" class="rc" cx="95" cy="95" r="82" fill="none" stroke="#e8ab47" stroke-width="15" stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515"/>
       </svg>
       <div class="center"><div><div class="big" id="resScore">0</div><div class="sub" id="resPct"></div></div></div>
     </div></div>
@@ -1141,61 +942,150 @@ function rResults(){
     <div class="stat-row">
       <div class="stat"><div class="sv" id="stQuiz">0</div><div class="sl">quiz points</div></div>
       <div class="stat"><div class="sv" id="stFirst">0</div><div class="sl">first-try wins</div></div>
-      <div class="stat"><div class="sv">${gamesCount}</div><div class="sl">games played</div></div>
+      <div class="stat"><div class="sv">${TASK_COUNT}</div><div class="sl">tasks completed</div></div>
     </div>
-    <button class="btn btn-primary" style="margin-top:26px" onclick="restart()">${I.refresh}<span>Play again — new questions · Main lagi</span></button>
-    <div class="hint" style="color:#9cb1d6;margin-top:10px">Every run shuffles the questions · Setiap sesi soal diacak ulang</div>
+    <button class="btn btn-primary" style="margin-top:26px" onclick="restart()">${I.refresh}<span>Play again — new order · Main lagi</span></button>
+    <div class="hint" style="color:#c4d5ec;margin-top:10px">Every run shuffles the answers · Setiap sesi jawaban diacak ulang</div>
     <div class="credits">Photos: Wikimedia Commons contributors (CC BY / CC BY-SA / public domain)</div>
   </div></section>`;
 }
 
 /* ============================================================
-   MOUNT & NAV
+   DECK ASSEMBLY
 ============================================================ */
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+let slides=[];
+let QUIZ_OFFSET=0;
+const TASK_COUNT = ORDERS.length + FILLS.length + 1 /*match*/ + PREDICTS.length + 5 /*labs*/;
+
+function buildDeck(){
+  slides=[
+    {type:'cover'},
+    {type:'content',key:'welcome'},
+    {type:'content',key:'analog'},
+    {type:'lab',fn:rLabPot},
+    {type:'content',key:'divider'},
+    {type:'content',key:'ldr'},
+    {type:'lab',fn:rLabNight},
+    {type:'quiz'},{type:'quiz'},
+    {type:'content',key:'button'},
+    {type:'order',data:ORDERS[0]},
+    {type:'content',key:'dht'},
+    {type:'fill',data:FILLS[0]},
+    {type:'content',key:'sonar'},
+    {type:'lab',fn:rLabDist},
+    {type:'content',key:'pir'},
+    {type:'match',data:MATCH_SENSORS},
+    {type:'quiz'},{type:'quiz'},
+    {type:'content',key:'servo'},
+    {type:'lab',fn:rLabServo},
+    {type:'content',key:'motor'},
+    {type:'order',data:ORDERS[1]},
+    {type:'content',key:'buzzer'},
+    {type:'fill',data:FILLS[3]},
+    {type:'content',key:'rgb'},
+    {type:'lab',fn:rLabColor},
+    {type:'content',key:'relay'},
+    {type:'quiz'},{type:'quiz'},
+    {type:'content',key:'vars'},
+    {type:'fill',data:FILLS[1]},
+    {type:'content',key:'ifelse'},
+    {type:'fill',data:FILLS[2]},
+    {type:'content',key:'logic'},
+    {type:'predict',data:PREDICTS[0]},
+    {type:'content',key:'loops'},
+    {type:'predict',data:PREDICTS[1]},
+    {type:'content',key:'funcs'},
+    {type:'order',data:ORDERS[2]},
+    {type:'content',key:'serial'},
+    {type:'predict',data:PREDICTS[2]},
+    {type:'content',key:'robotintro'},
+    {type:'content',key:'linefollow'},
+    {type:'fill',data:FILLS[4]},
+    {type:'content',key:'obstacle'},
+    {type:'predict',data:PREDICTS[3]},
+    {type:'quiz'},{type:'quiz'},
+    {type:'content',key:'roadmap'},
+    {type:'gallery'},
+    {type:'results'},
+  ];
+  QUIZ_OFFSET=0;
+}
+
+let quizIdxMap=[]; // slide-index -> QUIZ pool index
 function mount(){
   buildDeck();
-  quizCount=slides.filter(s=>s.type==='quiz').length;
-  MAX=quizCount*100+GAME_MAX;
-  answered={};attempts={};firstTry=0;
-  g.quizPts=0;g.circuitDone=false;g.circuitOn=false;
-  g.polDone=false;g.polTries=0;g.idDone=false;g.idTries=0;
-  g.ohmDone=false;g.pwmDone=false;g.pwmTries=0;g.binDone=false;g.binTries=0;
-  g.bugDone=false;g.bugTries=0;
-  if(g.blinkTimer)clearTimeout(g.blinkTimer);g.blinkTimer=null;g.blinkOn=false;g.blinkDelay=1000;g.blinkBonus=false;
+  answered={};attempts={};firstTry=0;g={doneMap:{},triesMap:{},orderState:{},matchState:{}};
+  let quizPool = shuffle(QUIZ.map((_,i)=>i));
+  quizIdxMap=[];
   const root=document.getElementById('slides');root.innerHTML='';
   slides.forEach((s,idx)=>{
     let h='';
     switch(s.type){
       case 'cover':h=rCover();break;
-      case 'content':h=rContent(s);break;
-      case 'stats':h=rStats();break;
-      case 'ohmlaw':h=rOhmLaw();break;
-      case 'quiz':h=rQuiz(s,idx);break;
-      case 'gameCircuit':h=rGameCircuit();break;
-      case 'gameOhm':h=rGameOhm();break;
-      case 'gamePolarity':h=rGamePolarity();break;
-      case 'gameID':h=rGameID();break;
-      case 'gamePWM':h=rGamePWM();break;
-      case 'gameMatch':h=rGameMatch();break;
-      case 'gameBinary':h=rGameBinary();break;
-      case 'blinkIntro':h=rBlinkIntro();break;
-      case 'gameBlink':h=rGameBlink();break;
-      case 'codeVocab':h=rCodeVocab();break;
-      case 'gameBug':h=rGameBug();break;
-      case 'gameOrder':h=rGameOrder();break;
-      case 'gameSensor':h=rGameSensor();break;
-      case 'projects':h=rProjects();break;
-      case 'roadmap':h=rRoadmap();break;
+      case 'content':h=rContent(s.key);break;
+      case 'lab':h=s.fn();break;
+      case 'order':h=rOrder(s.data);break;
+      case 'fill':h=rFill(s.data);break;
+      case 'match':h=rMatch(s.data);break;
+      case 'predict':h=rPredict(s.data);break;
+      case 'quiz':{
+        const qi=quizPool.shift();
+        quizIdxMap[idx]=qi;
+        h=rQuizAt(idx,qi);
+        break;
+      }
+      case 'gallery':h=rGallery();break;
       case 'results':h=rResults();break;
     }
     root.appendChild(el(h));
   });
   document.getElementById('totNum').textContent=slides.length;
   showSlide(0);
-  ohmUpdate();pwmUpdate();
+  potUpdate();nightUpdate();distUpdate();servoUpdate();colorUpdate();
+}
+function rQuizAt(idx,qi){
+  const s=QUIZ[qi];
+  const opts=shuffle(s.opts.map(o=>({...o})));
+  return `<section class="slide"><div class="card quiz">
+    <div class="qnum">Checkpoint · Kuis</div>
+    <h2>${s.q.en}</h2><div class="q-id id">${s.q.id}</div>
+    <div class="opts">
+      ${opts.map((o,i)=>`<button class="opt" onclick="answer(${idx},this)" data-ok="${o.ok?1:0}">
+        <span class="key">${String.fromCharCode(65+i)}</span>
+        <span class="otext">${o.en}<span class="id">${o.id}</span></span></button>`).join('')}
+    </div>
+    <div class="feedback" id="fb${idx}"><span class="fi"></span><span><b class="ft"></b><span class="id fx">${s.exp.id}</span></span></div>
+  </div></section>`;
+}
+function rCover(){
+  return `<section class="slide"><div class="dark-panel cover">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <div class="eyebrow"><span class="dot"></span>Part 2 · Bagian 2</div>
+    <h1>Sensors, Actuators<br>&amp; Mini Robots</h1>
+    <div class="h1-id">Sensor, Aktuator &amp; Robot Mini</div>
+    <p>The story continues where Part 1 left off. Real sensors, real actuators, real photos, and a lot more hands-on building than testing.
+      <br><span class="id">Kisahnya berlanjut dari akhir Bagian 1. Sensor nyata, aktuator nyata, foto nyata, dan jauh lebih banyak praktik daripada ujian.</span></p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="go(1)">Continue the lesson · Lanjutkan ${I.arrow}</button>
+      <span class="meta-pill">${QUIZ.length} quiz questions</span>
+      <span class="meta-pill">${TASK_COUNT}+ hands-on build tasks</span>
+    </div>
+  </div></section>`;
 }
 
 const nodes=()=>document.querySelectorAll('.slide');
+let cur=0,score=0,firstTry=0,answered={},attempts={},g={};
+function addPoints(n,small){
+  score+=n;
+  document.getElementById('scoreVal').textContent=score;
+  const chip=document.getElementById('scoreChip');
+  chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');
+  const f=document.createElement('span');
+  f.className='float-pts '+(small?'small':'big');f.textContent='+'+n;
+  chip.appendChild(f);setTimeout(()=>f.remove(),1100);
+}
 function showSlide(i){
   cur=Math.max(0,Math.min(slides.length-1,i));
   nodes().forEach((n,idx)=>n.classList.toggle('active',idx===cur));
@@ -1204,7 +1094,6 @@ function showSlide(i){
   document.getElementById('backBtn').disabled=cur===0;
   document.getElementById('nextBtn').style.visibility=cur===slides.length-1?'hidden':'visible';
   if(slides[cur].type==='results')fillResults();
-  if(slides[cur].type!=='gameBlink')stopBlink();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function go(d){showSlide(cur+d);}
@@ -1214,23 +1103,24 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ============================================================
-   QUIZ
+   QUIZ LOGIC
 ============================================================ */
 function answer(idx,btn){
   if(answered[idx])return;
   attempts[idx]=(attempts[idx]||0)+1;
   const fb=document.getElementById('fb'+idx);
+  const qi=quizIdxMap[idx];
   if(btn.dataset.ok==='1'){
     answered[idx]=true;
     const t=attempts[idx],pts=tieredPts(t);
     if(t===1)firstTry++;
-    g.quizPts+=pts;
+    g.quizPts=(g.quizPts||0)+pts;
     btn.classList.add('correct','locked');
     btn.parentElement.querySelectorAll('.opt').forEach(o=>{o.classList.add('locked');if(o!==btn&&o.dataset.ok!=='1')o.classList.add('dim');});
     addPoints(pts,false);
     fb.className='feedback ok show';
     fb.querySelector('.fi').innerHTML=I.tick;
-    fb.querySelector('.ft').textContent=(t===1?'Perfect, first try! +':'Correct! +')+pts+' — '+slides[idx].data.exp.en;
+    fb.querySelector('.ft').textContent=(t===1?'Perfect, first try! +':'Correct! +')+pts+' — '+QUIZ[qi].exp.en;
   }else{
     btn.classList.add('wrong','locked');
     addPoints(10,true);
@@ -1239,261 +1129,209 @@ function answer(idx,btn){
 }
 
 /* ============================================================
-   GAME 1 — circuit
+   GENERIC ORDER TASK
 ============================================================ */
-function toggleCircuit(){
-  g.circuitOn=!g.circuitOn;
-  const arm=document.getElementById('gArm'),bulb=document.getElementById('gBulb'),
-        fil=document.getElementById('gFil'),st=document.getElementById('gStatus'),
-        flow=document.getElementById('gFlow'),hint=document.getElementById('gHint');
-  if(g.circuitOn){
-    arm.setAttribute('x2','75');arm.setAttribute('y2','178');arm.setAttribute('stroke','#2c8f63');
-    bulb.setAttribute('fill','#e3a23b');bulb.setAttribute('stroke','#b97f1f');bulb.classList.add('pulse');
-    fil.setAttribute('stroke','#8a5f00');flow.classList.add('on');
-    st.className='status-tag on';st.textContent='Circuit CLOSED · Tertutup — light ON';
-    if(!g.circuitDone){g.circuitDone=true;addPoints(100,false);hint.textContent='+100! The loop is complete — current flows. · Lingkaran lengkap — arus mengalir!';}
-    else hint.textContent='Current flows around the loop. · Arus mengalir mengelilingi rangkaian.';
-  }else{
-    arm.setAttribute('x2','84');arm.setAttribute('y2','156');arm.setAttribute('stroke','#c95555');
-    bulb.setAttribute('fill','#cfd6e0');bulb.setAttribute('stroke','#aab4c2');bulb.classList.remove('pulse');
-    fil.setAttribute('stroke','#aab4c2');flow.classList.remove('on');
-    st.className='status-tag off';st.textContent='Circuit OPEN · Terbuka';
-    hint.textContent='The gap stops the current. · Celah menghentikan arus.';
-  }
-}
-
-/* ============================================================
-   GAME 2 — Ohm lab
-============================================================ */
-function ohmUpdate(){
-  const vEl=document.getElementById('ohmV');if(!vEl)return;
-  const V=+vEl.value,R=+document.getElementById('ohmR').value;
-  const Ima=V/R*1000;
-  document.getElementById('ohmVv').textContent=V.toFixed(1)+' V';
-  document.getElementById('ohmRv').textContent=R+' Ω';
-  document.getElementById('ohmI').textContent=Ima.toFixed(1);
-  const zone=document.querySelector('.zone');
-  const maxI=60,pct=Math.min(100,Ima/maxI*100);
-  document.getElementById('ohmNeedle').style.left='calc('+pct+'% - 2px)';
-  const s=document.getElementById('ohmSafe');
-  s.style.left=(15/maxI*100)+'%';s.style.width=((25-15)/maxI*100)+'%';
-  const st=document.getElementById('ohmStatus');
-  if(Ima>25){st.className='status-tag mid';st.textContent='Too much — the LED would burn! · Terlalu besar!';}
-  else if(Ima<15){st.className='status-tag off';st.textContent='Too little — very dim. · Terlalu kecil — sangat redup.';}
-  else{
-    st.className='status-tag on';st.textContent='Perfect — safe zone! · Sempurna — zona aman!';
-    if(!g.ohmDone){
-      g.ohmDone=true;addPoints(100,false);firstTry++;
-      okFb(document.getElementById('ohmFb'),'+100 — you just used Ohm\u2019s Law like a real engineer.','+100 — kamu baru saja memakai Hukum Ohm seperti insinyur sungguhan.');
+function orderPick(id,btn){
+  const spec = ORDERS.find(o=>o.id===id);
+  if(!g.orderState[id])g.orderState[id]={pos:0,mistakes:0};
+  const st=g.orderState[id];
+  const i=+btn.dataset.i;
+  const fb=document.getElementById('fb-'+id);
+  if(i===st.pos){
+    btn.classList.add('used');
+    const seq=document.getElementById('seq-'+id);
+    if(st.pos===0)seq.innerHTML='';
+    if(st.pos>0)seq.insertAdjacentHTML('beforeend',`<span class="arrowsep">${I.arrow}</span>`);
+    seq.insertAdjacentHTML('beforeend',`<span class="slot">${spec.steps[i]}</span>`);
+    st.pos++;
+    if(st.pos===spec.steps.length){
+      const pts=Math.max(40,100-15*st.mistakes);
+      if(st.mistakes===0)firstTry++;
+      addPoints(pts,false);
+      okFb(fb,'+'+pts+' — perfectly wired! Nice work.','Rangkaian sempurna! Kerja bagus.');
     }
-  }
-}
-
-/* ============================================================
-   GAME 3 — polarity
-============================================================ */
-function polPick(i){
-  if(g.polDone)return;
-  g.polTries++;
-  const card=document.getElementById('pol'+i),fb=document.getElementById('polFb');
-  if(i===g.polCorrectIdx){
-    g.polDone=true;
-    card.classList.add('correct','locked');
-    document.getElementById('pol'+(1-i)).classList.add('locked');
-    card.innerHTML=polSvg(true,true)+`<div class="pname">Circuit ${i===0?'A':'B'} — lights up!</div><div class="pid id">Menyala!</div>`;
-    const pts=tieredPts(g.polTries);if(g.polTries===1)firstTry++;
-    addPoints(pts,false);
-    okFb(fb,'+'+pts+' — current enters through the + leg.','Arus masuk lewat kaki +, jadi LED menyala.');
   }else{
-    card.classList.add('wrong');setTimeout(()=>card.classList.remove('wrong'),450);
-    addPoints(10,true);
-    noFb(fb,'+10 — that LED is backwards, no light.','LED itu terbalik, tidak menyala. Coba yang satunya!');
+    st.mistakes++;
+    btn.classList.add('err');setTimeout(()=>btn.classList.remove('err'),450);
+    addPoints(5,true);
+    noFb(fb,'+5 — not yet, check the order again.','Belum tepat, periksa urutannya lagi.');
   }
 }
 
 /* ============================================================
-   GAME 4 — component ID
+   GENERIC FILL-IN TASK
 ============================================================ */
-function idPick(i){
-  if(g.idDone)return;
-  g.idTries++;
-  const card=document.getElementById('idc'+i),fb=document.getElementById('idFb');
-  if(g.idItems[i].ok){
-    g.idDone=true;
-    card.classList.add('correct','locked');
-    document.querySelectorAll('.idcard').forEach(c=>c.classList.add('locked'));
-    const pts=tieredPts(g.idTries);if(g.idTries===1)firstTry++;
+function fillPick(id,btn,ok,text){
+  if(g.doneMap[id])return;
+  g.triesMap[id]=(g.triesMap[id]||0)+1;
+  const fb=document.getElementById('fb-'+id);
+  const spec=FILLS.find(f=>f.id===id);
+  if(ok){
+    g.doneMap[id]=true;
+    btn.classList.add('correct','locked');
+    document.querySelectorAll('#opts-'+id+' .fillopt').forEach(o=>o.classList.add('locked'));
+    document.getElementById('blank-'+id).textContent=text;
+    document.getElementById('blank-'+id).classList.add('filled');
+    const t=g.triesMap[id],pts=tieredPts(t);
+    if(t===1)firstTry++;
     addPoints(pts,false);
-    okFb(fb,'+'+pts+' — the color stripes gave it away.','Garis-garis warnanya yang menandakan.');
+    okFb(fb,'+'+pts+' — '+spec.expEn,spec.expId);
   }else{
-    card.classList.add('wrong');setTimeout(()=>card.classList.remove('wrong'),450);
+    btn.classList.add('wrong');setTimeout(()=>btn.classList.remove('wrong'),450);
     addPoints(10,true);
-    noFb(fb,'+10 — not this one. Look for the striped bodies.','Bukan yang ini. Cari badan bergaris warna.');
+    noFb(fb,'+10 — not quite, read the code again.','Belum pas, baca kodenya lagi.');
   }
 }
 
 /* ============================================================
-   GAME 5 — PWM
+   GENERIC MATCH TASK
 ============================================================ */
-function pwmUpdate(){
-  const s=document.getElementById('pwmSlider');if(!s)return;
-  const v=+s.value,duty=v/255;
-  document.getElementById('pwmVv').textContent=v;
-  document.getElementById('pwmValTxt').textContent=v;
-  document.getElementById('pwmLed').style.opacity=(0.08+0.92*duty).toFixed(2);
-  document.getElementById('pwmDuty').textContent=Math.round(duty*100)+'%';
-  /* square wave: two periods */
-  const w=240,x0=10,yH=12,yL=40,per=w/2,hi=per*duty;
-  let d='';
-  for(let k=0;k<2;k++){
-    const a=x0+k*per;
-    d+=`M ${a} ${yL} L ${a} ${yH} L ${a+Math.max(1,hi)} ${yH} L ${a+Math.max(1,hi)} ${yL} L ${a+per} ${yL} `;
-  }
-  document.getElementById('pwmWave').setAttribute('d',d);
-}
-function pwmCheck(){
-  if(g.pwmDone)return;
-  g.pwmTries++;
-  const v=+document.getElementById('pwmSlider').value,fb=document.getElementById('pwmFb');
-  if(Math.abs(v-g.pwmTarget)<=12){
-    g.pwmDone=true;
-    const pts=tieredPts(g.pwmTries);if(g.pwmTries===1)firstTry++;
-    addPoints(pts,false);
-    okFb(fb,'+'+pts+' — analogWrite(9, '+v+') accepted. That is real PWM.','analogWrite(9, '+v+') diterima. Itu PWM sungguhan.');
-  }else{
-    addPoints(10,true);
-    noFb(fb,'+10 — '+(v<g.pwmTarget?'brighter! Slide right.':'dimmer! Slide left.'),(v<g.pwmTarget?'Lebih terang! Geser ke kanan.':'Lebih redup! Geser ke kiri.'));
-  }
-}
-
-/* ============================================================
-   GAME 6 & 11 — match (pins 'm' / sensors 's')
-============================================================ */
-function matchPick(btn,mode){
+function matchPick(id,btn){
   if(btn.classList.contains('done'))return;
-  const stateSel=mode==='m'?'matchSel':'senSel';
-  const stateDone=mode==='m'?'matchDone':'senDone';
-  const total=mode==='m'?4:3,per=mode==='m'?25:30;
-  const hint=document.getElementById(mode==='m'?'mHint':'sHint');
-  const scope=btn.closest('.match-wrap');
-  if(!g[stateSel]){g[stateSel]=btn;btn.classList.add('sel');return;}
-  if(g[stateSel]===btn){btn.classList.remove('sel');g[stateSel]=null;return;}
-  if(g[stateSel].dataset.side===btn.dataset.side){g[stateSel].classList.remove('sel');g[stateSel]=btn;btn.classList.add('sel');return;}
-  const a=g[stateSel],b=btn;a.classList.remove('sel');
+  const spec=MATCH_SENSORS;
+  if(!g.matchState[id])g.matchState[id]={sel:null,done:0};
+  const st=g.matchState[id];
+  if(!st.sel){st.sel=btn;btn.classList.add('sel');return;}
+  if(st.sel===btn){btn.classList.remove('sel');st.sel=null;return;}
+  if(st.sel.dataset.side===btn.dataset.side){st.sel.classList.remove('sel');st.sel=btn;btn.classList.add('sel');return;}
+  const a=st.sel,b=btn;a.classList.remove('sel');
   if(a.dataset.i===b.dataset.i){
     a.classList.add('done');b.classList.add('done');
-    g[stateDone]++;
-    let pts=per;
-    if(g[stateDone]===total&&mode==='s')pts+=10; /* finish bonus */
+    st.done++;
+    let pts=spec.per; if(st.done===spec.total)pts+=15;
     addPoints(pts,false);
-    hint.textContent=g[stateDone]+' / '+total+' matched · tercocokkan';
-    if(g[stateDone]===total)hint.textContent='All matched! · Semua cocok!';
+    const hint=document.getElementById('hint-'+id);
+    hint.textContent=st.done+' / '+spec.total+' matched · tercocokkan';
+    if(st.done===spec.total)hint.textContent='All matched! Sensor superpowers unlocked. · Semua cocok!';
   }else{
     a.classList.add('err');b.classList.add('err');
     setTimeout(()=>{a.classList.remove('err');b.classList.remove('err');},450);
     addPoints(5,true);
   }
-  g[stateSel]=null;
+  st.sel=null;
 }
 
 /* ============================================================
-   GAME 7 — binary
+   GENERIC PREDICT TASK
 ============================================================ */
-function bitFlip(i){
-  if(g.binDone)return;
-  g.bits[i]=1-g.bits[i];
-  const b=document.getElementById('bit'+i);
-  b.classList.toggle('on',!!g.bits[i]);
-  b.querySelector('.bd').textContent=g.bits[i];
-  const sum=g.bits[0]*8+g.bits[1]*4+g.bits[2]*2+g.bits[3];
-  document.getElementById('binSum').textContent=sum;
-}
-function binCheck(){
-  if(g.binDone)return;
-  g.binTries++;
-  const sum=g.bits[0]*8+g.bits[1]*4+g.bits[2]*2+g.bits[3];
-  const fb=document.getElementById('binFb');
-  if(sum===g.binTarget){
-    g.binDone=true;
-    const pts=tieredPts(g.binTries);if(g.binTries===1)firstTry++;
+function predictPick(id,i,ok){
+  if(g.doneMap[id])return;
+  g.triesMap[id]=(g.triesMap[id]||0)+1;
+  const spec=[...PREDICTS].find(p=>p.id===id);
+  const line=document.querySelector('#lines-'+id+' [data-i="'+i+'"]');
+  const fb=document.getElementById('fb-'+id);
+  if(ok){
+    g.doneMap[id]=true;
+    line.classList.add('used');
+    document.querySelectorAll('#lines-'+id+' .chip').forEach(c=>c.classList.add('used'));
+    const t=g.triesMap[id],pts=tieredPts(t);
+    if(t===1)firstTry++;
     addPoints(pts,false);
-    const bin=g.bits.join('');
-    okFb(fb,'+'+pts+' — '+g.binTarget+' in binary is '+bin+'. You speak computer now.','+'+pts+' — '+g.binTarget+' dalam biner adalah '+bin+'. Kamu bisa bahasa komputer sekarang.');
+    okFb(fb,'+'+pts+' — '+spec.expEn,spec.expId);
   }else{
+    line.classList.add('err');setTimeout(()=>line.classList.remove('err'),450);
     addPoints(10,true);
-    noFb(fb,'+10 — you have '+sum+', target is '+g.binTarget+'. '+(sum<g.binTarget?'Add a bigger bit.':'Turn one off.'),(sum<g.binTarget?'Nyalakan bit yang lebih besar.':'Matikan satu bit.'));
+    noFb(fb,'+10 — not this one, think it through again.','Bukan ini, pikirkan lagi.');
   }
 }
 
 /* ============================================================
-   GAME 8 — blink sim
+   LAB LOGIC
 ============================================================ */
-function setDelay(v){
-  g.blinkDelay=+v;
-  document.getElementById('delayVal').textContent=v+' ms';
-  document.getElementById('cD1').textContent=v;
-  document.getElementById('cD2').textContent=v;
+function potUpdate(){
+  const s=document.getElementById('potSlider');if(!s)return;
+  const v=+s.value;
+  document.getElementById('potVal').textContent=v;
+  document.getElementById('potVolt').textContent=(v/1023*5).toFixed(2)+' V';
+  document.getElementById('potNeedle').style.transform=`translate(-50%,-100%) rotate(${(v/1023*270)-135}deg)`;
 }
-function blinkStep(){
-  const led=document.getElementById('simLed');
-  if(!led){stopBlink();return;}
-  g.blinkOn=!g.blinkOn;
-  led.classList.toggle('on',g.blinkOn);
-  g.blinkTimer=setTimeout(blinkStep,g.blinkDelay);
-}
-function uploadBlink(){
-  stopBlink();
-  if(!g.blinkBonus){g.blinkBonus=true;addPoints(50,false);}
-  const b=document.getElementById('uplBtn');
-  b.innerHTML=I.refresh+'<span>Running · Berjalan</span>';
-  g.blinkOn=false;blinkStep();
-}
-function stopBlink(){if(g.blinkTimer){clearTimeout(g.blinkTimer);g.blinkTimer=null;}}
-
-/* ============================================================
-   GAME 9 — bug hunt
-============================================================ */
-function bugPick(i){
-  if(g.bugDone)return;
-  g.bugTries++;
-  const line=document.getElementById('bug'+i),fb=document.getElementById('bugFb');
-  if(g.bugLines[i].ok){
-    g.bugDone=true;
-    line.classList.add('correct','locked');
-    document.querySelectorAll('.bugline').forEach(l=>l.classList.add('locked'));
-    const pts=tieredPts(g.bugTries);if(g.bugTries===1)firstTry++;
+function potCheck(){
+  if(g.doneMap['lab-pot'])return;
+  const v=+document.getElementById('potSlider').value;
+  const fb=document.getElementById('potFb');
+  g.triesMap['lab-pot']=(g.triesMap['lab-pot']||0)+1;
+  if(Math.abs(v-512)<=40){
+    g.doneMap['lab-pot']=true;
+    const t=g.triesMap['lab-pot'],pts=tieredPts(t);if(t===1)firstTry++;
     addPoints(pts,false);
-    okFb(fb,'+'+pts+' — HGIH should be HIGH. Compilers forgive nothing.','HGIH seharusnya HIGH. Komputer tidak memaafkan salah ketik.');
+    okFb(fb,'+'+pts+' — right in the middle, about 2.5 V.','Tepat di tengah, sekitar 2,5 V.');
   }else{
-    line.classList.add('wrong');setTimeout(()=>line.classList.remove('wrong'),450);
     addPoints(10,true);
-    noFb(fb,'+10 — that line is fine. Read each word slowly.','Baris itu benar. Baca tiap kata pelan-pelan.');
+    noFb(fb,'+10 — '+(v<512?'turn it further right.':'turn it further left.'),(v<512?'Putar lebih ke kanan.':'Putar lebih ke kiri.'));
   }
 }
-
-/* ============================================================
-   GAME 10 — wiring order
-============================================================ */
-function orderPick(btn){
-  const i=+btn.dataset.i,fb=document.getElementById('orderFb');
-  if(i===g.orderPos){
-    btn.classList.add('used');
-    const seq=document.getElementById('orderSeq');
-    if(g.orderPos===0)seq.innerHTML='';
-    if(g.orderPos>0)seq.insertAdjacentHTML('beforeend',`<span class="arrowsep">${I.arrow}</span>`);
-    seq.insertAdjacentHTML('beforeend',`<span class="slot">${g.orderSteps[i]}</span>`);
-    g.orderPos++;
-    if(g.orderPos===g.orderSteps.length){
-      const pts=Math.max(40,100-15*g.orderMistakes);
-      if(g.orderMistakes===0)firstTry++;
-      addPoints(pts,false);
-      okFb(fb,'+'+pts+' — perfect loop! Upload the code and it blinks.','Lingkaran sempurna! Unggah kodenya dan LED berkedip.');
-    }
+function nightUpdate(){
+  const s=document.getElementById('nightSlider');if(!s)return;
+  const v=+s.value;
+  document.getElementById('nightVal').textContent=v;
+  const led=document.getElementById('nightLed'),st=document.getElementById('nightStatus');
+  if(v<300){
+    led.classList.add('on');st.className='status-tag on';st.textContent='LED on — it is dark · LED menyala — sedang gelap';
+    if(!g.doneMap['lab-night']){g.doneMap['lab-night']=true;firstTry++;addPoints(100,false);
+      okFb(document.getElementById('nightFb'),'+100 — threshold found, the night-light works!','Ambang batas ditemukan, lampu malam berfungsi!');}
   }else{
-    g.orderMistakes++;
-    btn.classList.add('err');setTimeout(()=>btn.classList.remove('err'),450);
-    addPoints(5,true);
-    noFb(fb,'+5 — not yet! Current leaves the pin first.','Belum tepat! Arus keluar dari pin dulu, lalu resistor.');
+    led.classList.remove('on');st.className='status-tag off';st.textContent='LED off · Siang hari';
+  }
+}
+function distUpdate(){
+  const s=document.getElementById('distSlider');if(!s)return;
+  const t=+s.value, d=(t*0.034/2);
+  document.getElementById('distTime').textContent=t+' µs';
+  document.getElementById('distVal').textContent=d.toFixed(1);
+  const st=document.getElementById('distStatus');
+  if(d<20){
+    st.className='status-tag mid';st.textContent='Too close — robot would stop! · Terlalu dekat — robot akan berhenti!';
+    if(!g.doneMap['lab-dist']){g.doneMap['lab-dist']=true;firstTry++;addPoints(100,false);
+      okFb(document.getElementById('distFb'),'+100 — you just computed a real distance formula.','Kamu baru saja menghitung rumus jarak sungguhan.');}
+  }else{
+    st.className='status-tag on';st.textContent='Clear path · Jalur aman';
+  }
+}
+function servoUpdate(){
+  const s=document.getElementById('servoSlider');if(!s)return;
+  const v=+s.value;
+  document.getElementById('servoValTxt').textContent=v;
+  document.getElementById('servoArm').style.transform=`translateX(-50%) rotate(${v-90}deg)`;
+  if(!g.servoTarget){g.servoTarget=20+Math.floor(Math.random()*140);
+    document.getElementById('servoTargetHint').innerHTML='Target: <b>'+g.servoTarget+'&deg;</b> · Target: <b>'+g.servoTarget+'&deg;</b>';}
+}
+function servoCheck(){
+  if(g.doneMap['lab-servo'])return;
+  const v=+document.getElementById('servoSlider').value;
+  const fb=document.getElementById('servoFb');
+  g.triesMap['lab-servo']=(g.triesMap['lab-servo']||0)+1;
+  if(Math.abs(v-g.servoTarget)<=8){
+    g.doneMap['lab-servo']=true;
+    const t=g.triesMap['lab-servo'],pts=tieredPts(t);if(t===1)firstTry++;
+    addPoints(pts,false);
+    okFb(fb,'+'+pts+' — myServo.write('+v+') locked onto the target.','myServo.write('+v+') tepat mengenai target.');
+  }else{
+    addPoints(10,true);
+    noFb(fb,'+10 — '+(v<g.servoTarget?'aim further right.':'aim further left.'),(v<g.servoTarget?'Arahkan lebih ke kanan.':'Arahkan lebih ke kiri.'));
+  }
+}
+function colorUpdate(){
+  const r=document.getElementById('colR');if(!r)return;
+  const g_=document.getElementById('colG'),b=document.getElementById('colB');
+  document.getElementById('colRv').textContent=r.value;
+  document.getElementById('colGv').textContent=g_.value;
+  document.getElementById('colBv').textContent=b.value;
+  document.getElementById('colorSw').style.background=`rgb(${r.value},${g_.value},${b.value})`;
+}
+function colorCheck(){
+  if(g.doneMap['lab-color'])return;
+  const r=+document.getElementById('colR').value,gr=+document.getElementById('colG').value,b=+document.getElementById('colB').value;
+  const fb=document.getElementById('colorFb');
+  g.triesMap['lab-color']=(g.triesMap['lab-color']||0)+1;
+  const close = r>170 && gr>60 && gr<160 && b<60;
+  if(close){
+    g.doneMap['lab-color']=true;
+    const t=g.triesMap['lab-color'],pts=tieredPts(t);if(t===1)firstTry++;
+    addPoints(pts,false);
+    okFb(fb,'+'+pts+' — that is a warm orange, nicely mixed.','Itu oranye hangat, tercampur dengan baik.');
+  }else{
+    addPoints(10,true);
+    noFb(fb,'+10 — push red higher, keep blue low.','Naikkan merah, jaga biru tetap rendah.');
   }
 }
 
@@ -1501,6 +1339,7 @@ function orderPick(btn){
    RESULTS
 ============================================================ */
 function fillResults(){
+  const MAX = QUIZ.length*100 + TASK_COUNT*100;
   const pct=Math.min(100,Math.round(score/MAX*100));
   const sEl=document.getElementById('resScore');
   clearInterval(window._cnt);
@@ -1513,23 +1352,23 @@ function fillResults(){
   setTimeout(()=>{document.getElementById('ringArc').style.strokeDashoffset=515-(515*pct/100);},150);
   document.getElementById('resPct').textContent='of '+MAX+' · '+pct+'%';
   let lvl,msgEn,msgId,bg;
-  if(pct>=85){lvl='Circuit Master';bg='#e3a23b';msgEn='Outstanding! Circuits, binary, PWM, code — you understand it all.';msgId='Luar biasa! Rangkaian, biner, PWM, kode — kamu paham semuanya.';}
-  else if(pct>=65){lvl='Junior Engineer';bg='#e3a23b';msgEn='Excellent! You are ready to build real Arduino projects.';msgId='Hebat! Kamu siap membangun proyek Arduino sungguhan.';}
-  else if(pct>=45){lvl='Rising Maker';bg='#5fd3c7';msgEn='Nice work! One more run and you will master it — the questions will be new.';msgId='Bagus! Sekali lagi dan kamu akan mahir — soalnya akan baru.';}
-  else{lvl='Brave Explorer';bg='#5fd3c7';msgEn='Good start! Replay the lesson — every run gives new questions.';msgId='Awal yang bagus! Ulangi pelajarannya — tiap sesi soalnya baru.';}
+  if(pct>=85){lvl='Robotics Engineer';bg='#e8ab47';msgEn='Outstanding! Sensors, actuators, logic, robots — you understand the full picture.';msgId='Luar biasa! Sensor, aktuator, logika, robot — kamu paham gambaran lengkapnya.';}
+  else if(pct>=65){lvl='Junior Maker';bg='#e8ab47';msgEn='Excellent! You are ready to build a real sensing, moving project.';msgId='Hebat! Kamu siap membangun proyek nyata yang merasakan dan bergerak.';}
+  else if(pct>=45){lvl='Rising Builder';bg='#5fd3c7';msgEn='Nice work! One more run and every task will click into place.';msgId='Bagus! Sekali lagi dan semua tugas akan semakin lancar.';}
+  else{lvl='Curious Explorer';bg='#5fd3c7';msgEn='Good start! Replay Part 2 — the tasks and quizzes reshuffle every run.';msgId='Awal yang bagus! Ulangi Bagian 2 — tugas dan kuis akan diacak ulang.';}
   document.getElementById('resLevelTxt').textContent=lvl;
   document.getElementById('resLevel').style.background=bg;
   document.getElementById('resMsg').innerHTML=msgEn+'<br><span class="id">'+msgId+'</span>';
-  document.getElementById('stQuiz').textContent=g.quizPts;
+  document.getElementById('stQuiz').textContent=g.quizPts||0;
   document.getElementById('stFirst').textContent=firstTry;
 }
 
 /* ============================================================
-   RESTART — full reshuffle, fresh state (nothing stored)
+   RESTART
 ============================================================ */
 function restart(){
-  stopBlink();
   score=0;document.getElementById('scoreVal').textContent='0';
+  g.servoTarget=null;
   mount();
 }
 
